@@ -82,8 +82,8 @@ function loadUserList() {
     displayUserList(snap.key, data.name, data.profilePicUrl, data.imageUrl);
   };
 
-  firebase.database().ref('/user-profiles/').limitToLast(12).on('child_added', callback);
-  firebase.database().ref('/user-profiles/').limitToLast(12).on('child_changed', callback);
+  firebase.database().ref('/user-profiles/').on('child_added', callback);
+  firebase.database().ref('/user-profiles/').on('child_changed', callback);
 }
 
 // Saves a new message on the Firebase DB.
@@ -253,7 +253,7 @@ var MESSAGE_TEMPLATE =
 var USER_LIST_TEMPLATE =
     '<div class="user-list-container">' +
       '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-name"></div>' +
+      '<div class="user-href"><div class="user-name"></div></div>' +
     '</div>';
 
 // A loading image URL.
@@ -294,6 +294,11 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
+
+function helloWorld(name) {
+  console.log(name);
+}
+
 function displayUserList(key, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
@@ -308,11 +313,15 @@ function displayUserList(key, name, picUrl, imageUrl) {
     div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
   }
   div.querySelector('.user-name').textContent = name;
+  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
+  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(name); });
+
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
   UserListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
+
 
 // Enables or disables the submit button depending on the values of the input
 // fields.
