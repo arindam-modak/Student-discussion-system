@@ -309,8 +309,10 @@ function helloWorld(uid,name) {
   group_array.push(uid);
   console.log(group_array);
 }
+
 var count=1;
 function formGroup(){
+
   firebase.database().ref('/groups/').push({
           group_name: "Group"+count ,
           members: group_array,
@@ -330,12 +332,11 @@ function formGroup(){
     for(i=0;i<temp.length;i++){
       var temp2=[];
       //console.log(temp[i]);
-      ref.orderByChild("uid").equalTo(temp[i]).once("value",snapshot => {
+      ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
       if (snapshot.exists()){ 
-          var data2 = snapshot.val();
-          //temp2 = data2.memberIn;
-          //console.log(temp2);
-          console.log(data2);
+          snapshot.forEach(function(childSnapshot) {
+            console.log(childSnapshot.val().memberIn);
+          });
           //temp2.pop();
           //temp2.push(gname);
       }
