@@ -305,7 +305,6 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
 
 var group_array=[];
 function helloWorld(uid,name) {
-  console.log(name);
   group_array.push(uid);
   console.log(group_array);
 }
@@ -313,32 +312,31 @@ function helloWorld(uid,name) {
 var count=1;
 function formGroup(){
 
-  firebase.database().ref('/groups/').push({
+  var temp = group_array;
+  var gid = firebase.database().ref('/groups/').push({
           group_name: "Group"+count ,
           members: group_array,
           //admin : user.uid,
           date_form: new Date().toLocaleString()
-  }).catch(function(error) {
-      console.error('Error writing new message to Firebase Database', error);
-  });
+  }).key;
   //var name2= "Group"+count;
   var db = firebase.database();
-  var callback = function(snap) {
-    var data = snap.val();
-    var temp = data.members;
-    var gname = data.group_name;
     var ref =  db.ref("/user-profiles/");
     var i=0;
     for(i=0;i<temp.length;i++){
       var temp2=[];
       //console.log(temp[i]);
+      var keyy;
       ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
       if (snapshot.exists()){ 
+        
           snapshot.forEach(function(childSnapshot) {
-            console.log(childSnapshot.val().memberIn);
+            keyy = childSnapshot.key;
+            temp2 = childSnapshot.val().memberIn;
           });
-          //temp2.pop();
-          //temp2.push(gname);
+          if(temp2[0]=="001")
+            temp2.pop();
+          temp2.push(gid);
       }
     });
       /*database.once('value',function(snap) {
@@ -350,12 +348,10 @@ function formGroup(){
     // The Promise was rejected.
       console.log('Error: ',error);
     });*/
-    //ref.orderByChild("uid").equalTo(temp[i]).update({memberIn : temp2});
+    //console.log(gid);
+      firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
     } 
-  };
-  var ref = db.ref("/groups/");
-  ref.on('child_added', callback);
-  count++;
+    group_array=[];
 
 } 
 
