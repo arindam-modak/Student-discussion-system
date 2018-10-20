@@ -95,6 +95,17 @@ function loadUserList() {
   firebase.database().ref('/user-profiles/').on('child_changed', callback);
 }
 
+function loadGroupList(){
+
+  var callback = function(snap) {
+    var data = snap.val();
+    displayGroupList(snap.key , data.uid , data.name, data.profilePicUrl , data.imageUrl , data.memberIn);
+  };
+
+  firebase.database().ref('/user-profiles/').on('child_added', callback);
+  firebase.database().ref('/user-profiles/').on('child_changed', callback);
+}
+
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
   // Add a new message entry to the Firebase database.
@@ -265,6 +276,11 @@ var USER_LIST_TEMPLATE =
       '<div class="user-href"><div class="user-name"></div></div>' +
     '</div>';
 
+var GROUP_LIST_TEMPLATE =
+    '<div class="user-list-container">' +
+      '<div class="user-spacing"><div class="user-pic"></div></div>' +
+      '<div class="user-href"><div class="user-name"></div></div>' +
+    '</div>';
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
@@ -378,7 +394,29 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
+function displayGroupList(key, uid, name, picUrl, imageurl, groupArray){
+  var div = document.getElementById(key);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = GROUP_LIST_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', key);
+    UserListElement.appendChild(div);
+  }
+  if (picUrl) {
+    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.user-name').textContent = name;
+  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
+  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(uid,name); });
 
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  UserListElement.scrollTop = messageListElement.scrollHeight;
+  messageInputElement.focus();
+
+}
 // Enables or disables the submit button depending on the values of the input
 // fields.
 function toggleButton() {
@@ -416,6 +454,7 @@ var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 var formGroupElement = document.getElementById('group');
+var showChatElement = document.getElementById('showChat');
 // Saves message on form submit.
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
@@ -438,3 +477,4 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 loadUserList();
+loadGroupList();
