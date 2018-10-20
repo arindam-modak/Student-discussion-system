@@ -24,7 +24,6 @@ function signIn() {
     var token = result.credential.accessToken;
     // The signed-in user info.
     var user = result.user;
-    console.log(user.uid);
     var db = firebase.database();
     var ref = db.ref("/user-profiles/");
     array.push("001");
@@ -54,6 +53,7 @@ function signOut() {
 // Initiate firebase auth.
 function initFirebaseAuth() {
   // Listen to auth state changes.
+  //console.log(getUserName());
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
@@ -79,7 +79,6 @@ function loadMessages() {
     var data = snap.val();
     displayMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
   };
-
   firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
 }
@@ -95,16 +94,55 @@ function loadUserList() {
   firebase.database().ref('/user-profiles/').on('child_changed', callback);
 }
 
+
+
+
+
+
 function loadGroupList(){
+  var temp2=[];
+  console.log(firebase.auth().currentUser.uid);
+    
 
-  var callback = function(snap) {
-    var data = snap.val();
-    displayGroupList(snap.key , data.uid , data.name, data.profilePicUrl , data.imageUrl , data.memberIn);
-  };
+  firebase.database().ref().child("/user-profiles/").orderByChild("uid").equalTo(firebase.auth().currentUser.uid).on("value", snap=>{
+    if (snap.exists()){ 
+          snap.forEach(function(childSnapshot) {
+                  //console.log(childSnapshot.val().memberIn);
+            temp2 = childSnapshot.val().memberIn;
+            //console.log(temp2);
+          });
+      }
+  });
+  const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
+  sleep(5000).then(() => {
+      console.log(temp2);
+      for(var i=0;i<temp2.length;i++) {
+        var gname;
+        if(temp2[i]) {
 
-  firebase.database().ref('/user-profiles/').on('child_added', callback);
-  firebase.database().ref('/user-profiles/').on('child_changed', callback);
+          firebase.database().ref("/groups/"+temp2[i]).on("value", snap=>{
+          if (snap.exists()){ 
+
+                gname = snap.val().group_name;
+                displayGroupList(snap.key,gname);
+            }
+          });  
+          
+        }
+      }
+  })
+
+  
+
+
+
 }
+
+
+
+
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
@@ -214,7 +252,6 @@ function authStateObserver(user) {
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
-
     // Set the user's profile pic and name.
     userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
     userNameElement.textContent = userName;
@@ -229,6 +266,11 @@ function authStateObserver(user) {
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
+
+
+    loadGroupList();
+
+
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
@@ -277,14 +319,16 @@ var USER_LIST_TEMPLATE =
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
-    '<div class="user-list-container">' +
-      '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div></div>' +
+    '<div class="group-list-container">' +
+      '<div class="group-spacing"></div>' +
+      '<div class="group-href"><div class="group-name"></div></div>' +
     '</div>';
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
 // Displays a Message in the UI.
+
+
 function displayMessage(key, name, text, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
@@ -394,27 +438,24 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
-function displayGroupList(key, uid, name, picUrl, imageurl, groupArray){
-  var div = document.getElementById(key);
+function displayGroupList(groupId,groupName){
+  var div = document.getElementById(groupId);
+  console.log(groupId);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = GROUP_LIST_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
-    UserListElement.appendChild(div);
+    div.setAttribute('id', groupId);
+    GroupListElement.appendChild(div);
   }
-  if (picUrl) {
-    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
-  }
-  div.querySelector('.user-name').textContent = name;
-  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(uid,name); });
+  div.querySelector('.group-name').textContent = groupName;
+  div.querySelector('.group-href').setAttribute('id', "group"+groupId);
+  //div.querySelector('.group-name').addEventListener('click', function(){ helloWorld(uid,name); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
-  UserListElement.scrollTop = messageListElement.scrollHeight;
-  messageInputElement.focus();
+  GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
 }
 // Enables or disables the submit button depending on the values of the input
@@ -442,6 +483,8 @@ checkSetup();
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById('messages');
 var UserListElement = document.getElementById('user-list');
+var GroupListElement = document.getElementById('group-list');
+
 var messageFormElement = document.getElementById('message-form');
 var messageInputElement = document.getElementById('message');
 var submitButtonElement = document.getElementById('submit');
@@ -477,4 +520,5 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 loadUserList();
-loadGroupList();
+//loadGroupList();
+//console.log(getUserName());
