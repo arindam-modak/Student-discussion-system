@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 'use strict';
-
+var array = [];
 // Signs-in Friendly Chat.
 function signIn() {
   // Sign in Firebase using popup auth and Google as the identity provider.
@@ -25,15 +25,24 @@ function signIn() {
     // The signed-in user info.
     var user = result.user;
     console.log(user.uid);
-    firebase.database().ref('/user-profiles/').push({
-      name: user.displayName,
-      uid: user.uid,
-      profilePicUrl: getProfilePicUrl()
-    }).catch(function(error) {
-      console.error('Error writing new message to Firebase Database', error);
+    var db = firebase.database();
+    var ref = db.ref("/user-profiles/");
+    array.push("001");
+    ref.orderByChild("uid").equalTo(user.uid).once("value",snapshot => {
+      if (!snapshot.exists()){ 
+          firebase.database().ref('/user-profiles/').push({
+            name: user.displayName,
+            uid: user.uid,
+            memberIn : array,
+            profilePicUrl: getProfilePicUrl()
+        }).catch(function(error) {
+            console.error('Error writing new message to Firebase Database', error);
+        });
+      }
     });
     // ...
   });
+  array=[];
 }
 
 // Signs-out of Friendly Chat.
@@ -79,7 +88,7 @@ function loadUserList() {
   // Loads the last 12 messages and listen for new ones.
   var callback = function(snap) {
     var data = snap.val();
-    displayUserList(snap.key, data.name, data.profilePicUrl, data.imageUrl);
+    displayUserList(snap.key , data.uid , data.name, data.profilePicUrl , data.imageUrl);
   };
 
   firebase.database().ref('/user-profiles/').on('child_added', callback);
@@ -294,12 +303,62 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
-
-function helloWorld(name) {
+var group_array=[];
+function helloWorld(uid,name) {
   console.log(name);
+  group_array.push(uid);
+  console.log(group_array);
 }
+var count=1;
+function formGroup(){
+  firebase.database().ref('/groups/').push({
+          group_name: "Group"+count ,
+          members: group_array,
+          //admin : user.uid,
+          date_form: new Date().toLocaleString()
+  }).catch(function(error) {
+      console.error('Error writing new message to Firebase Database', error);
+  });
+  //var name2= "Group"+count;
+  var db = firebase.database();
+  var callback = function(snap) {
+    var data = snap.val();
+    var temp = data.members;
+    var gname = data.group_name;
+    var ref =  db.ref("/user-profiles/");
+    var i=0;
+    for(i=0;i<temp.length;i++){
+      var temp2=[];
+      //console.log(temp[i]);
+      ref.orderByChild("uid").equalTo(temp[i]).once("value",snapshot => {
+      if (snapshot.exists()){ 
+          var data2 = snapshot.val();
+          //temp2 = data2.memberIn;
+          //console.log(temp2);
+          console.log(data2);
+          //temp2.pop();
+          //temp2.push(gname);
+      }
+    });
+      /*database.once('value',function(snap) {
+        if(snap.exists()){
+          //do your thing here.
+          
+        }
+      }).catch(function(error) {
+    // The Promise was rejected.
+      console.log('Error: ',error);
+    });*/
+    //ref.orderByChild("uid").equalTo(temp[i]).update({memberIn : temp2});
+    } 
+  };
+  var ref = db.ref("/groups/");
+  ref.on('child_added', callback);
+  count++;
 
-function displayUserList(key, name, picUrl, imageUrl) {
+} 
+
+function displayUserList(key, uid, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -314,7 +373,7 @@ function displayUserList(key, name, picUrl, imageUrl) {
   }
   div.querySelector('.user-name').textContent = name;
   div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(name); });
+  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(uid,name); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
@@ -359,12 +418,12 @@ var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-
+var formGroupElement = document.getElementById('group');
 // Saves message on form submit.
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
-
+formGroupElement.addEventListener('click',formGroup);
 // Toggle for the button.
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);
