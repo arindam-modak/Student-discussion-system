@@ -89,11 +89,23 @@ function loadUserList() {
     var data = snap.val();
     displayUserList(snap.key , data.uid , data.name, data.profilePicUrl , data.imageUrl);
   };
-
   firebase.database().ref('/user-profiles/').on('child_added', callback);
   firebase.database().ref('/user-profiles/').on('child_changed', callback);
 }
 
+function loadGroupMessages(groupId) {
+  activeGrouId = groupId;
+  var myNode = groupMessageListElement;
+  while (myNode.firstChild) {
+      myNode.removeChild(myNode.firstChild);
+  }
+  var callback = function(snap) {
+    var data = snap.val();
+    displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
+  };
+  firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_added', callback);
+  firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_changed', callback);
+}
 
 
 
@@ -181,6 +193,66 @@ function saveImageMessage(file) {
     console.error('There was an error uploading a file to Cloud Storage:', error);
   });
 }
+
+
+
+
+
+
+
+
+// Saves a new message on the Firebase DB.
+function groupsaveMessage(messageText,groupId) {
+  // Add a new message entry to the Firebase database.
+  return firebase.database().ref('/groups/'+groupId+'/messages').push({
+            uid: firebase.auth().currentUser.uid,
+            name: getUserName(),
+            text: messageText,
+            profilePicUrl: getProfilePicUrl(),
+            date: new Date().toLocaleString()
+        }).catch(function(error) {
+    console.error('Error writing new message to Firebase Database', error);
+  });
+}
+
+// Saves a new message containing an image in Firebase.
+// This first saves the image in Firebase storage.
+function groupsaveImageMessage(file,groupId) {
+  // 1 - We add a message with a loading icon that will get updated with the shared image.
+  firebase.database().ref('/groups/'+groupId+'/messages').push({
+    uid: firebase.auth().currentUser.uid,
+    name: getUserName(),
+    imageUrl: LOADING_IMAGE_URL,
+    profilePicUrl: getProfilePicUrl(),
+    date: new Date().toLocaleString()
+  }).then(function(messageRef) {
+    // 2 - Upload the image to Cloud Storage.
+    var filePath = firebase.auth().currentUser.uid + '/' + messageRef.key + '/' + file.name;
+    return firebase.storage().ref(filePath).put(file).then(function(fileSnapshot) {
+      // 3 - Generate a public URL for the file.
+      return fileSnapshot.ref.getDownloadURL().then((url) => {
+        // 4 - Update the chat message placeholder with the image’s URL.
+        return messageRef.update({
+          imageUrl: url,
+          storageUri: fileSnapshot.metadata.fullPath
+        });
+      });
+    });
+  }).catch(function(error) {
+    console.error('There was an error uploading a file to Cloud Storage:', error);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // Saves the messaging device token to the datastore.
 function saveMessagingDeviceToken() {
@@ -363,8 +435,9 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
+
 var group_array=[];
-function helloWorld(uid,name) {
+function addGroupMember(uid,name) {
   group_array.push(uid);
   console.log(group_array);
 }
@@ -430,13 +503,14 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
   }
   div.querySelector('.user-name').textContent = name;
   div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ helloWorld(uid,name); });
+  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
   UserListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
+
 
 function displayGroupList(groupId,groupName){
   var div = document.getElementById(groupId);
@@ -451,13 +525,106 @@ function displayGroupList(groupId,groupName){
   }
   div.querySelector('.group-name').textContent = groupName;
   div.querySelector('.group-href').setAttribute('id', "group"+groupId);
-  //div.querySelector('.group-name').addEventListener('click', function(){ helloWorld(uid,name); });
+  div.querySelector('.group-name').addEventListener('click', function(){ loadGroupMessages(groupId); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
   GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
 }
+
+
+function displayGroupMessage(key, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(key);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = MESSAGE_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', key);
+    groupMessageListElement.appendChild(div);
+  }
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.name').textContent = name;
+  var groupMessageElement = div.querySelector('.message');
+  if (text) { // If the message is text.
+    groupMessageElement.textContent = text;
+    // Replace all line breaks by <br>.
+    groupMessageElement.innerHTML = groupMessageElement.innerHTML.replace(/\n/g, '<br>');
+  } else if (imageUrl) { // If the message is an image.
+    var image = document.createElement('img');
+    image.addEventListener('load', function() {
+      groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+    });
+    image.src = imageUrl + '&' + new Date().getTime();
+    groupMessageElement.innerHTML = '';
+    groupMessageElement.appendChild(image);
+  }
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+  groupMessageInputElement.focus();
+}
+
+
+
+
+
+
+
+function onGroupMediaFileSelected(event) {
+  event.preventDefault();
+  var file = event.target.files[0];
+
+  // Clear the selection in the file picker input.
+  groupImageFormElement.reset();
+
+  // Check if the file is an image.
+  if (!file.type.match('image.*')) {
+    var data = {
+      message: 'You can only share images',
+      timeout: 2000
+    };
+    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+    return;
+  }
+  // Check if the user is signed-in
+  if (checkSignedInWithMessage()) {
+    groupsaveImageMessage(file,activeGrouId);
+  }
+}
+
+// Triggered when the send new message form is submitted.
+function onGroupMessageFormSubmit(e) {
+  e.preventDefault();
+  // Check that the user entered a message and is signed in.
+  if (groupMessageInputElement.value && checkSignedInWithMessage()) {
+    groupsaveMessage(groupMessageInputElement.value,activeGrouId).then(function() {
+      // Clear message text field and re-enable the SEND button.
+      resetMaterialTextfield(groupMessageInputElement);
+      groupToggleButton();
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+function groupToggleButton() {
+  if (groupMessageInputElement.value) {
+    groupSubmitButtonElement.removeAttribute('disabled');
+  } else {
+    groupSubmitButtonElement.setAttribute('disabled', 'true');
+  }
+}
+
 // Enables or disables the submit button depending on the values of the input
 // fields.
 function toggleButton() {
@@ -498,6 +665,35 @@ var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 var formGroupElement = document.getElementById('group');
 var showChatElement = document.getElementById('showChat');
+
+
+
+
+
+// Group message section
+var groupMessageListElement = document.getElementById('group-messages');
+var groupMessageFormElement = document.getElementById('group-message-form');
+var groupMessageInputElement = document.getElementById('group-message');
+var groupSubmitButtonElement = document.getElementById('group-submit');
+var groupImageButtonElement = document.getElementById('group-submitImage');
+var groupImageFormElement = document.getElementById('group-image-form');
+var groupMediaCaptureElement = document.getElementById('group-mediaCapture');
+groupMessageFormElement.addEventListener('submit', onGroupMessageFormSubmit);
+
+// Toggle for the button.
+groupMessageInputElement.addEventListener('keyup', groupToggleButton);
+groupMessageInputElement.addEventListener('change', groupToggleButton);
+
+// Events for image upload.
+groupImageButtonElement.addEventListener('click', function(e) {
+  e.preventDefault();
+  groupMediaCaptureElement.click();
+});
+groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
+var activeGrouId = null;
+
+
+
 // Saves message on form submit.
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);

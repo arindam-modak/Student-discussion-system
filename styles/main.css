@@ -17,15 +17,15 @@
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
-main, #messages-card {
+main, #group-messages-card, #messages-card {
   height: 100%;
   padding-bottom: 0;
 }
-#messages-card-container {
+#messages-card-container,#group-messages-card-container {
   height: calc(100% - 35px);
   padding-bottom: 0;
 }
-#messages-card {
+#messages-card,#group-messages-card {
   margin-top: 15px;
 }
 .mdl-layout__header-row span {
@@ -51,14 +51,14 @@ main, #messages-card {
   padding-top: 0;
   padding-bottom: 0;
 }
-#messages {
+#messages, #group-messages {
   overflow-y: auto;
   margin-bottom: 10px;
   height: calc(100% - 80px);
   display: flex;
   flex-direction: column;
 }
-#message-filler {
+#message-filler,#group-message-filler {
   flex-grow: 1;
 }
 .message-container:first-of-type {
@@ -101,13 +101,13 @@ main, #messages-card {
   font-size: 12px;
   box-sizing: border-box;
 }
-#message-form {
+#message-form, #group-message-form {
   display: flex;
   flex-direction: row;
   width: calc(100% - 48px);
   float: left;
 }
-#image-form {
+#image-form,#group-image-form {
   display: flex;
   flex-direction: row;
   width: 48px;
@@ -116,7 +116,10 @@ main, #messages-card {
 #message-form .mdl-textfield {
   width: calc(100% - 100px);
 }
-#message-form button, #image-form button {
+#group-message-form .mdl-textfield {
+  width: calc(100% - 100px);
+}
+#message-form button, #image-form button, #group-message-form button, #group-image-form button {
   width: 100px;
   margin: 15px 0 0 10px;
 }
@@ -155,7 +158,14 @@ main, #messages-card {
   padding-right: 10px;
   padding-left: 20px;
 }
+
 #image-form #submitImage {
+  width: auto;
+  padding: 0 6px 0 1px;
+  min-width: 0;
+}
+
+#group-image-form #group-submitImage {
   width: auto;
   padding: 0 6px 0 1px;
   min-width: 0;
@@ -163,11 +173,14 @@ main, #messages-card {
 #image-form #submitImage .material-icons {
   top: -1px;
 }
+#group-image-form #group-submitImage .material-icons {
+  top: -1px;
+}
 .message img {
   max-width: 300px;
   max-height: 200px;
 }
-#mediaCapture {
+#mediaCapture,#group-mediaCapture {
   display: none;
 }
 @media screen and (max-width: 610px) {
