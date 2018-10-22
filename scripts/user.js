@@ -44,11 +44,47 @@ function signIn() {
   array=[];
 }
 
+function save(){
+    var db = firebase.database();
+    var ref = db.ref("/user-profiles/");
+    //console.log(currentUserID);
+    var key;
+    ref.orderByChild("uid").equalTo(firebase.auth().currentUser.uid).once("value",snapshot => {
+          console.log("No");
+          //var data = snapshot.val();
+          snapshot.forEach(function(childSnapshot) {
+                  //console.log(childSnapshot.val().memberIn);
+            console.log(childSnapshot.key);
+            //console.log(temp2);
+              firebase.database().ref('/user-profiles/'+childSnapshot.key).update({
+                roll: rollElement.value,
+                semester: semElement.value,
+                mobile : mobileElement.value,
+                depart: departElement.value
+              }).catch(function(error) {
+                console.error('Error writing new message to Firebase Database', error);
+              });
+          });
+          //labelElement.setAttribute ('value','No');
+          //labelElement.removeAttribute('hidden');
+            console.log("no");
+          /*ref.orderBychild("uid").equalTo(firebase.auth().currentUser.uid).push({
+            roll: rollElement.value,
+            semester: semElement.value,
+            mobile : mobileElement.value,
+            deaprt: departElement.value
+        }).catch(function(error) {
+            console.error('Error writing new message to Firebase Database', error);
+        });*/
+    });
+
+}
 // Signs-out of Friendly Chat.
 function signOut() {
   // Sign out of Firebase.
+  //signInMessageElement.setAttribute('hidden','true');
   firebase.auth().signOut();
-   window.location = "http://localhost:5000";
+  window.location = "http://localhost:5000";
 }
 
 // Initiate firebase auth.
@@ -318,30 +354,56 @@ function onMessageFormSubmit(e) {
     });
   }
 }
-
+function sendMe(){
+  window.location = "http://localhost:5000/Dashboard.html";
+}
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
+    var rollno;
+    var sems;
+    var depart;
+    var mobile;
+    var db = firebase.database();
+    var ref = db.ref("/user-profiles/");
+    //console.log(currentUserID);
+    var key;
+    ref.orderByChild("uid").equalTo(firebase.auth().currentUser.uid).once("value",snapshot => {
+          //console.log("No");
+          //var data = snapshot.val();
+          snapshot.forEach(function(childSnapshot) {
+            //console.log(childSnapshot.key);
+            var data = childSnapshot.val();
+            if(data.roll){
+              rollElement.setAttribute('value',data.roll);
+              semElement.setAttribute('value',data.semester);
+              departElement.setAttribute('value',data.depart);
+              mobileElement.setAttribute('value',data.mobile);
+            }
+          });
+    });
+    //currentUserID = firebase.auth().currentUser.uid;
     // Set the user's profile pic and name.
     userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
     userNameElement.textContent = userName;
-
     // Show user's profile and sign-out button.
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
-
+    //signInMessageElement.removeAttribute('hidden');
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-
+    nameElement.setAttribute('value',userName);
+    profPicElement.setAttribute('src',profilePicUrl);
+    //emailElement.setAttribute('value',userEmail);
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
 
 
-    loadGroupList();
+    //loadGroupList();
 
 
   } else { // User is signed out!
@@ -513,7 +575,7 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
 }
 
 
-function displayGroupList(groupId,groupName){
+/*function displayGroupList(groupId,groupName){
   var div = document.getElementById(groupId);
   console.log(groupId);
   // If an element for that message does not exists yet we create it.
@@ -532,7 +594,7 @@ function displayGroupList(groupId,groupName){
   setTimeout(function() {div.classList.add('visible')}, 1);
   GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
-}
+}*/
 
 
 function displayGroupMessage(key, name, text, picUrl, imageUrl) {
@@ -644,82 +706,40 @@ function checkSetup() {
         'sure you are running the codelab using `firebase serve`');
   }
 }
-function sendMe(){
-  window.location = "http://localhost:5000/Dashboard.html";
-}
+
 // Checks that Firebase has been imported.
 checkSetup();
 
 // Shortcuts to DOM Elements.
-var messageListElement = document.getElementById('messages');
-var UserListElement = document.getElementById('user-list');
-var GroupListElement = document.getElementById('group-list');
-
-var messageFormElement = document.getElementById('message-form');
-var messageInputElement = document.getElementById('message');
-var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
-var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
+//var signInMessageElement = document.getElementById('msg');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
-var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-var formGroupElement = document.getElementById('group');
-var showChatElement = document.getElementById('showChat');
+//var signInSnackbarElement = document.getElementById('must-signin-snackbar');
+var nameElement = document.getElementById('name');
+var saveButtonElement = document.getElementById('save-button');
+var semElement = document.getElementById('sem');
+var departElement = document.getElementById('depart');
+var mobileElement = document.getElementById('mob');
+var rollElement = document.getElementById('roll');
+var profPicElement = document.getElementById('prof-pic');
+//var labelElement = document.getElementById('label');
 
 
 
-
-
-// Group message section
-var groupMessageListElement = document.getElementById('group-messages');
-var groupMessageFormElement = document.getElementById('group-message-form');
-var groupMessageInputElement = document.getElementById('group-message');
-var groupSubmitButtonElement = document.getElementById('group-submit');
-var groupImageButtonElement = document.getElementById('group-submitImage');
-var groupImageFormElement = document.getElementById('group-image-form');
-var groupMediaCaptureElement = document.getElementById('group-mediaCapture');
-groupMessageFormElement.addEventListener('submit', onGroupMessageFormSubmit);
-
-// Toggle for the button.
-groupMessageInputElement.addEventListener('keyup', groupToggleButton);
-groupMessageInputElement.addEventListener('change', groupToggleButton);
-
-// Events for image upload.
-groupImageButtonElement.addEventListener('click', function(e) {
-  e.preventDefault();
-  groupMediaCaptureElement.click();
-});
-groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
-var activeGrouId = null;
-
-
-
+saveButtonElement.addEventListener('click',save);
+userPicElement.addEventListener('click',sendMe);
+userNameElement.addEventListener('click',sendMe); 
 // Saves message on form submit.
-messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
-formGroupElement.addEventListener('click',formGroup);
-userNameElement.addEventListener('click',sendMe);
-userPicElement.addEventListener('click',sendMe);
-// Toggle for the button.
-messageInputElement.addEventListener('keyup', toggleButton);
-messageInputElement.addEventListener('change', toggleButton);
-
-// Events for image upload.
-imageButtonElement.addEventListener('click', function(e) {
-  e.preventDefault();
-  mediaCaptureElement.click();
-});
-mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 // initialize Firebase
 initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
-loadMessages();
-loadUserList();
+//loadMessages();
+//loadUserList();
 //loadGroupList();
 //console.log(getUserName());
