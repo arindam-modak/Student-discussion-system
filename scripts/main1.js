@@ -47,6 +47,7 @@ function signIn() {
 // Signs-out of Friendly Chat.
 function signOut() {
   // Sign out of Firebase.
+  signInMessageElement.setAttribute('hidden','true');
   firebase.auth().signOut();
 }
 
@@ -317,7 +318,9 @@ function onMessageFormSubmit(e) {
     });
   }
 }
-
+function sendMe(){
+  window.location = "http://localhost:5000/Dashboard.html";
+}
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
@@ -332,7 +335,7 @@ function authStateObserver(user) {
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
-
+    signInMessageElement.removeAttribute('hidden');
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
 
@@ -340,7 +343,7 @@ function authStateObserver(user) {
     saveMessagingDeviceToken();
 
 
-    loadGroupList();
+    //loadGroupList();
 
 
   } else { // User is signed out!
@@ -512,7 +515,7 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
 }
 
 
-function displayGroupList(groupId,groupName){
+/*function displayGroupList(groupId,groupName){
   var div = document.getElementById(groupId);
   console.log(groupId);
   // If an element for that message does not exists yet we create it.
@@ -531,7 +534,7 @@ function displayGroupList(groupId,groupName){
   setTimeout(function() {div.classList.add('visible')}, 1);
   GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
-}
+}*/
 
 
 function displayGroupMessage(key, name, text, picUrl, imageUrl) {
@@ -648,7 +651,7 @@ function checkSetup() {
 checkSetup();
 
 // Shortcuts to DOM Elements.
-
+var signInMessageElement = document.getElementById('msg');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
@@ -662,8 +665,8 @@ var signOutButtonElement = document.getElementById('sign-out');
 
 
 
-
-
+userPicElement.addEventListener('click',sendMe);
+userNameElement.addEventListener('click',sendMe); 
 // Saves message on form submit.
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);

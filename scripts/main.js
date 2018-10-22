@@ -643,7 +643,9 @@ function checkSetup() {
         'sure you are running the codelab using `firebase serve`');
   }
 }
-
+function sendMe(){
+  window.location = "http://localhost:5000/Dashboard.html";
+}
 // Checks that Firebase has been imported.
 checkSetup();
 
@@ -699,6 +701,8 @@ messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
 formGroupElement.addEventListener('click',formGroup);
+userNameElement.addEventListener('click',sendMe);
+userPicElement.addEventListener('click',sendMe);
 // Toggle for the button.
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);

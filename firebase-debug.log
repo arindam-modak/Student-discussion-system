@@ -1,0 +1,66 @@
+[debug] [2018-10-22T08:02:36.020Z] ----------------------------------------------------------------------
+[debug] [2018-10-22T08:02:36.030Z] Command:       G:\Nodejs\node.exe C:\Users\DELL\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-10-22T08:02:36.030Z] CLI Version:   4.2.0
+[debug] [2018-10-22T08:02:36.030Z] Platform:      win32
+[debug] [2018-10-22T08:02:36.030Z] Node Version:  v8.11.4
+[debug] [2018-10-22T08:02:36.030Z] Time:          Mon Oct 22 2018 13:32:36 GMT+0530 (India Standard Time)
+[debug] [2018-10-22T08:02:36.030Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-22T08:02:36.060Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-22T08:02:36.060Z] > authorizing via signed-in user
+[debug] [2018-10-22T08:02:36.070Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-10-22T08:02:36.070Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+
+[debug] [2018-10-22T08:02:36.986Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-22T08:02:37.031Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-22T08:02:39.838Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-22T08:02:39.838Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-22T08:02:41.939Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\DELL\Student-discussion-system'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-10-22T08:03:21.861Z] Fetching environment
+[debug] [2018-10-22T08:03:21.881Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485:getServerAppConfig  
+ 
+[debug] [2018-10-22T08:03:21.881Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-22T08:03:22.626Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-22T08:03:22.626Z] Starting @google-cloud/functions-emulator
+[debug] [2018-10-22T08:03:23.236Z] <<< HTTP RESPONSE 200
+[info] i  hosting[friendly-chat-398ac]: Serving hosting files from: ./
+[info] +  hosting[friendly-chat-398ac]: Local server: http://localhost:5000
+[debug] [2018-10-22T08:03:44.105Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
+[debug] [2018-10-22T08:57:00.678Z] Error: connect ETIMEDOUT 172.217.160.227:443
+    at Object._errnoException (util.js:992:11)
+    at _exceptionWithHostPort (util.js:1014:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1186:14)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2018-10-22T08:57:00.678Z] Error: connect ETIMEDOUT 172.217.160.227:443
+    at Object._errnoException (util.js:992:11)
+    at _exceptionWithHostPort (util.js:1014:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1186:14)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2018-10-22T08:57:00.678Z] Error: socket hang up
+    at createHangUpError (_http_client.js:331:15)
+    at TLSSocket.socketCloseListener (_http_client.js:363:23)
+    at emitOne (events.js:121:20)
+    at TLSSocket.emit (events.js:211:7)
+    at _handle.close (net.js:557:12)
+    at TCP.done [as _onclose] (_tls_wrap.js:356:7)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2018-10-22T08:57:00.678Z] Error: socket hang up
+    at createHangUpError (_http_client.js:331:15)
+    at TLSSocket.socketCloseListener (_http_client.js:363:23)
+    at emitOne (events.js:121:20)
+    at TLSSocket.emit (events.js:211:7)
+    at _handle.close (net.js:557:12)
+    at TCP.done [as _onclose] (_tls_wrap.js:356:7)
+[error] 
+[error] Error: An unexpected error has occurred.
