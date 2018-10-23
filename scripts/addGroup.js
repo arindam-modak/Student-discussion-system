@@ -513,10 +513,31 @@ function formGroup(){
     group_array=[];
 
 } 
-function displaySearchedUserList(key,uid,name,picUrl,imageUrl){
 
+function displaySearchedUserList(key,uid,name,picUrl){
+  var div = document.getElementById(key);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = USER_LIST_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', key);
+    searchNamesList.appendChild(div);
+  }
+  if (picUrl) {
+    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.user-name').textContent = name;
+  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
+  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  searchNamesList.scrollTop = searchNamesList.scrollHeight;
+ // messageInputElement.focus();
 }
-function displayUserList(key, uid, name, picUrl, imageUrl) {
+
+/*function displayUserList(key, uid, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -537,7 +558,7 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
   setTimeout(function() {div.classList.add('visible')}, 1);
   UserListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
-}
+}*/
 
 
 /*function displayGroupList(groupId,groupName){
@@ -662,8 +683,10 @@ function toggleButton() {
     submitButtonElement.setAttribute('disabled', 'true');
   }
 }
+
+var input="";
 function search_names() {
- input = searchElement.value;
+  input = searchElement.value;
   //console.log(input);
   var myNode = searchNamesList;
   while (myNode.firstChild) {
@@ -675,7 +698,7 @@ function search_names() {
     var list=data.name;
     //console.log(list);
     if(list.substring(0,input.length)==input){
-      displaySearchedUserList(snap.key , data.uid , data.name, data.profilePicUrl , data.imageUrl);
+      displaySearchedUserList(snap.key , data.uid , data.name, data.profilePicUrl);
     }
     /*for (var i=0;i<list.length;i++){
       if(list[i].substring(0,input.length)==input){
