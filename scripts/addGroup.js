@@ -414,7 +414,10 @@ var USER_LIST_TEMPLATE =
     '</div>';
 
 var SEARCHED_USER_LIST_TEMPLATE = 
-    '<div class'
+    '<div class="user-list-container">' +
+      '<div class="user-spacing"><div class="user-pic"></div></div>' +
+      '<div class="user-href"><div class="user-name"></div><label id="x" class="x">x</label></div>' +
+    '</div>';
 
 var GROUP_LIST_TEMPLATE =
     '<div class="group-list-container">' +
@@ -460,20 +463,53 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
-
-
 var group_array=[];
-function addGroupMember(uid,name) {
-  group_array.push(uid);
-  console.log(group_array);
+
+function removeMember(uid,name,div){
+  //console.log(group_array);
+  membersListElement.removeChild(div);
+  /*for(var i=0;i<group_array.length;i++){
+    if(group_array[i]==uid){
+      group_array.slice(i,1);
+    }
+  }*/
+  group_array = group_array.filter(item => item !== uid)
+
+  //console.log(group_array);
 }
 
-var count=1;
+function addGroupMember(uid,name,picUrl) {
+  group_array.push(uid);
+  
+  //console.log(group_array);
+
+
+  var div = document.getElementById(uid);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = SEARCHED_USER_LIST_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', "A"+uid);
+    membersListElement.appendChild(div);
+  }
+  if (picUrl) {
+    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.user-name').textContent = name;
+  div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
+  //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  membersListElement.scrollTop = membersListElement.scrollHeight;
+}
+
 function formGroup(){
 
   var temp = group_array;
   var gid = firebase.database().ref('/groups/').push({
-          group_name: "Group"+count ,
+          group_name: document.getElementById('group-name').value ,
           members: group_array,
           //admin : user.uid,
           date_form: new Date().toLocaleString()
@@ -482,32 +518,27 @@ function formGroup(){
   var db = firebase.database();
     var ref =  db.ref("/user-profiles/");
     var i=0;
+    //console.log(temp);
     for(i=0;i<temp.length;i++){
       var temp2=[];
       //console.log(temp[i]);
       var keyy;
       ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
-      if (snapshot.exists()){ 
-        
+        if (snapshot.exists()){ 
+
           snapshot.forEach(function(childSnapshot) {
             keyy = childSnapshot.key;
+            //console.log(childSnapshot.val().memberIn);
             temp2 = childSnapshot.val().memberIn;
+            //console.log(temp2);
           });
-          if(temp2[0]=="001")
+          if(temp2[0]=="001"){
             temp2.pop();
+          }
           temp2.push(gid);
-      }
-    });
-      /*database.once('value',function(snap) {
-        if(snap.exists()){
-          //do your thing here.
-          
+          //console.log(temp2);
         }
-      }).catch(function(error) {
-    // The Promise was rejected.
-      console.log('Error: ',error);
-    });*/
-    //console.log(gid);
+      });
       firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
     } 
     group_array=[];
@@ -529,14 +560,14 @@ function displaySearchedUserList(key,uid,name,picUrl){
   }
   div.querySelector('.user-name').textContent = name;
   div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name,picUrl); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
   searchNamesList.scrollTop = searchNamesList.scrollHeight;
+  //group_array=[];
  // messageInputElement.focus();
 }
-
 /*function displayUserList(key, uid, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
@@ -684,9 +715,8 @@ function toggleButton() {
   }
 }
 
-var input="";
 function search_names() {
-  input = searchElement.value;
+  var input = searchElement.value;
   //console.log(input);
   var myNode = searchNamesList;
   while (myNode.firstChild) {
@@ -697,7 +727,7 @@ function search_names() {
     var list = [];
     var list=data.name;
     //console.log(list);
-    if(list.substring(0,input.length)==input){
+    if(list.substring(0,input.length)==input && input!=""){
       displaySearchedUserList(snap.key , data.uid , data.name, data.profilePicUrl);
     }
     /*for (var i=0;i<list.length;i++){
@@ -738,9 +768,10 @@ var signOutButtonElement = document.getElementById('sign-out');
 //var rollElement = document.getElementById('roll');
 //var profPicElement = document.getElementById('prof-pic');
 //var labelElement = document.getElementById('label');
-
-
-
+var createGroupElement = document.getElementById('create-group');
+createGroupElement.addEventListener('click',formGroup);
+var membersListElement = document.getElementById('members');
+//var xElement = document.getElementById('x');
 //saveButtonElement.addEventListener('click',save);
 userPicElement.addEventListener('click',sendMe);
 userNameElement.addEventListener('click',sendMe); 
@@ -751,8 +782,6 @@ signInButtonElement.addEventListener('click', signIn);
 var searchElement = document.getElementById("search");
 searchElement.addEventListener('keyup', search_names);
 var searchNamesList = document.getElementById('search-names');
-
-
 // initialize Firebase
 initFirebaseAuth();
 
