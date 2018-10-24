@@ -416,7 +416,7 @@ var USER_LIST_TEMPLATE =
 var SEARCHED_USER_LIST_TEMPLATE = 
     '<div class="user-list-container">' +
       '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div><label id="x" class="x">x</label></div>' +
+      '<div class="user-href"><div class="user-name"></div><button id="x" class="x">x</button></div>' +
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
@@ -516,7 +516,7 @@ function formGroup(){
   }).key;
   //var name2= "Group"+count;
   var db = firebase.database();
-    var ref =  db.ref("/user-profiles/");
+    var ref = db.ref("/user-profiles/");
     var i=0;
     //console.log(temp);
     for(i=0;i<temp.length;i++){
@@ -527,19 +527,25 @@ function formGroup(){
         if (snapshot.exists()){ 
 
           snapshot.forEach(function(childSnapshot) {
+            console.log(childSnapshot.val());
             keyy = childSnapshot.key;
             //console.log(childSnapshot.val().memberIn);
+            if(childSnapshot.val().memberIn)
             temp2 = childSnapshot.val().memberIn;
             //console.log(temp2);
           });
-          if(temp2[0]=="001"){
-            temp2.pop();
-          }
           temp2.push(gid);
-          //console.log(temp2);
+          console.log(temp2);
         }
+
       });
-      firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
+      const sleep = (milliseconds) => {
+          return new Promise(resolve => setTimeout(resolve, milliseconds))
+      }
+      sleep(5000).then(() => {
+          console.log(temp2);
+      firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2}); })
+      
     } 
     group_array=[];
 

@@ -1,0 +1,82 @@
+[debug] [2018-10-24T12:07:47.926Z] ----------------------------------------------------------------------
+[debug] [2018-10-24T12:07:47.926Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\arind\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-10-24T12:07:47.926Z] CLI Version:   4.2.0
+[debug] [2018-10-24T12:07:47.926Z] Platform:      win32
+[debug] [2018-10-24T12:07:47.926Z] Node Version:  v8.11.2
+[debug] [2018-10-24T12:07:47.926Z] Time:          Wed Oct 24 2018 17:37:47 GMT+0530 (India Standard Time)
+[debug] [2018-10-24T12:07:47.926Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-24T12:07:47.958Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-24T12:07:47.958Z] > authorizing via signed-in user
+[debug] [2018-10-24T12:07:47.958Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-24T12:07:49.964Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-24T12:07:49.964Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-24T12:07:52.101Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\arind\Desktop\projects\Student-discussion-system'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-10-24T12:08:07.634Z] Fetching environment
+[debug] [2018-10-24T12:08:07.681Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485:getServerAppConfig  
+ 
+[debug] [2018-10-24T12:08:07.681Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-24T12:08:08.654Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-24T12:08:08.654Z] Starting @google-cloud/functions-emulator
+[debug] [2018-10-24T12:08:09.140Z] <<< HTTP RESPONSE 200
+[info] i  hosting[friendly-chat-398ac]: Serving hosting files from: ./
+[info] +  hosting[friendly-chat-398ac]: Local server: http://localhost:5000
+[debug] [2018-10-24T12:08:15.758Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
+[debug] [2018-10-24T12:18:50.674Z] Error: getaddrinfo ENOTFOUND www.gstatic.com www.gstatic.com:443
+    at errnoException (dns.js:50:10)
+    at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:92:26)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2018-10-24T12:18:50.674Z] Error: socket hang up
+    at createHangUpError (_http_client.js:331:15)
+    at TLSSocket.socketCloseListener (_http_client.js:363:23)
+    at emitOne (events.js:121:20)
+    at TLSSocket.emit (events.js:211:7)
+    at _handle.close (net.js:557:12)
+    at TCP.done [as _onclose] (_tls_wrap.js:356:7)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2018-10-24T12:25:05.677Z] ----------------------------------------------------------------------
+[debug] [2018-10-24T12:25:05.677Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\arind\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-10-24T12:25:05.677Z] CLI Version:   4.2.0
+[debug] [2018-10-24T12:25:05.677Z] Platform:      win32
+[debug] [2018-10-24T12:25:05.677Z] Node Version:  v8.11.2
+[debug] [2018-10-24T12:25:05.677Z] Time:          Wed Oct 24 2018 17:55:05 GMT+0530 (India Standard Time)
+[debug] [2018-10-24T12:25:05.677Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-24T12:25:05.677Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-24T12:25:05.677Z] > authorizing via signed-in user
+[debug] [2018-10-24T12:25:05.677Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-10-24T12:25:05.677Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+
+[debug] [2018-10-24T12:25:06.279Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-24T12:25:06.333Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-24T12:25:07.803Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-24T12:25:07.803Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/friendly-chat-398ac  
+ 
+[debug] [2018-10-24T12:25:09.867Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\arind\Desktop\projects\Student-discussion-system'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-10-24T12:25:11.335Z] Fetching environment
+[debug] [2018-10-24T12:25:11.341Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485:getServerAppConfig  
+ 
+[debug] [2018-10-24T12:25:11.341Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/374773119485/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-24T12:25:12.105Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-24T12:25:12.105Z] Starting @google-cloud/functions-emulator
+[debug] [2018-10-24T12:25:12.560Z] <<< HTTP RESPONSE 200
+[info] i  hosting[friendly-chat-398ac]: Serving hosting files from: ./
+[info] +  hosting[friendly-chat-398ac]: Local server: http://localhost:5000
+[debug] [2018-10-24T12:25:19.433Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.

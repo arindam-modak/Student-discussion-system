@@ -26,13 +26,12 @@ function signIn() {
     var user = result.user;
     var db = firebase.database();
     var ref = db.ref("/user-profiles/");
-    array.push("001");
+    
     ref.orderByChild("uid").equalTo(user.uid).once("value",snapshot => {
       if (!snapshot.exists()){ 
           firebase.database().ref('/user-profiles/').push({
             name: user.displayName,
             uid: user.uid,
-            memberIn : array,
             profilePicUrl: getProfilePicUrl()
         }).catch(function(error) {
             console.error('Error writing new message to Firebase Database', error);
