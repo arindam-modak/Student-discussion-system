@@ -43,12 +43,12 @@ function signIn() {
   });
   array=[];
 }
+
 // Signs-out of Friendly Chat.
 function signOut() {
   // Sign out of Firebase.
-  //signInMessageElement.setAttribute('hidden','true');
   firebase.auth().signOut();
-  window.location = "http://localhost:5000";
+   window.location = "http://localhost:5000";
 }
 
 // Initiate firebase auth.
@@ -146,10 +146,6 @@ function loadGroupList(){
         }
       }
   })
-
-  
-
-
 
 }
 
@@ -318,47 +314,25 @@ function onMessageFormSubmit(e) {
     });
   }
 }
-function sendMe(){
-  window.location = "http://localhost:5000/Dashboard.html";
-}
+
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
-    /*var db = firebase.database();
-    var ref = db.ref("/user-profiles/");
-    //console.log(currentUserID);
-    var key;
-    ref.orderByChild("uid").equalTo(firebase.auth().currentUser.uid).once("value",snapshot => {
-          //console.log("No");
-          //var data = snapshot.val();
-          snapshot.forEach(function(childSnapshot) {
-            //console.log(childSnapshot.key);
-            var data = childSnapshot.val();
-            if(data.roll){
-              rollElement.setAttribute('value',data.roll);
-              semElement.setAttribute('value',data.semester);
-              departElement.setAttribute('value',data.depart);
-              mobileElement.setAttribute('value',data.mobile);
-            }
-          });
-    });*/
-    //currentUserID = firebase.auth().currentUser.uid;
     // Set the user's profile pic and name.
     userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
     userNameElement.textContent = userName;
+
     // Show user's profile and sign-out button.
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
-    //signInMessageElement.removeAttribute('hidden');
+
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-    //nameElement.setAttribute('value',userName);
-    //profPicElement.setAttribute('src',profilePicUrl);
-    //emailElement.setAttribute('value',userEmail);
+
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
 
@@ -413,16 +387,16 @@ var USER_LIST_TEMPLATE =
       '<div class="user-href"><div class="user-name"></div></div>' +
     '</div>';
 
-var SEARCHED_USER_LIST_TEMPLATE = 
-    '<div class="user-list-container">' +
-      '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div><button id="x" class="x">x</button></div>' +
-    '</div>';
-
 var GROUP_LIST_TEMPLATE =
     '<div class="group-list-container">' +
       '<div class="group-spacing"></div>' +
       '<div class="group-href"><div class="group-name"></div></div>' +
+    '</div>';
+
+var SEARCHED_USER_LIST_TEMPLATE = 
+    '<div class="user-list-container">' +
+      '<div class="user-spacing"><div class="user-pic"></div></div>' +
+      '<div class="user-href"><div class="user-name"></div><button id="x" class="x">x</button></div>' +
     '</div>';
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
@@ -463,7 +437,6 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
-var group_array=[];
 
 function removeMember(uid,name,div){
   //console.log(group_array);
@@ -478,13 +451,11 @@ function removeMember(uid,name,div){
   //console.log(group_array);
 }
 
-function addGroupMember(uid,name,picUrl) {
+var group_array=[];
+function addGroupMember(uid,name) {
   group_array.push(uid);
-  
-  //console.log(group_array);
-
-
-  var div = document.getElementById(uid);
+  console.log(group_array);
+  var div = document.getElementById('U'+uid);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
@@ -493,88 +464,63 @@ function addGroupMember(uid,name,picUrl) {
     div.setAttribute('id', "A"+uid);
     membersListElement.appendChild(div);
   }
-  if (picUrl) {
-    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
-  }
   div.querySelector('.user-name').textContent = name;
   div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
   //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
 
   // Show the card fading-in and scroll to view the new message.
-  setTimeout(function() {div.classList.add('visible')}, 1);
+  //setTimeout(function() {div.classList.add('visible')}, 1);
   membersListElement.scrollTop = membersListElement.scrollHeight;
 }
 
+var count=1;
 function formGroup(){
 
   var temp = group_array;
   var gid = firebase.database().ref('/groups/').push({
-          group_name: document.getElementById('group-name').value ,
+          group_name: groupNameElement.value ,
           members: group_array,
           //admin : user.uid,
           date_form: new Date().toLocaleString()
   }).key;
   //var name2= "Group"+count;
   var db = firebase.database();
-    var ref = db.ref("/user-profiles/");
+    var ref =  db.ref("/user-profiles/");
     var i=0;
-    //console.log(temp);
     for(i=0;i<temp.length;i++){
       var temp2=[];
       //console.log(temp[i]);
-      var keyy;
+      var keyy=null;
       ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
-        if (snapshot.exists()){ 
-
+      if (snapshot.exists()){ 
+        
           snapshot.forEach(function(childSnapshot) {
-            console.log(childSnapshot.val());
             keyy = childSnapshot.key;
-            //console.log(childSnapshot.val().memberIn);
-            if(childSnapshot.val().memberIn)
             temp2 = childSnapshot.val().memberIn;
-            //console.log(temp2);
           });
+          if(temp2[0]=="001")
+            temp2.pop();
           temp2.push(gid);
-          console.log(temp2);
-        }
-
-      });
-      const sleep = (milliseconds) => {
-          return new Promise(resolve => setTimeout(resolve, milliseconds))
       }
-      sleep(5000).then(() => {
-          console.log(temp2);
-      firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2}); })
-      
+    });
+      /*database.once('value',function(snap) {
+        if(snap.exists()){
+          //do your thing here.
+          
+        }
+      }).catch(function(error) {
+    // The Promise was rejected.
+      console.log('Error: ',error);
+    });*/
+    //console.log(gid);
+      if(keyy!=null)
+        firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
     } 
     group_array=[];
 
 } 
 
-function displaySearchedUserList(key,uid,name,picUrl){
-  var div = document.getElementById(key);
-  // If an element for that message does not exists yet we create it.
-  if (!div) {
-    var container = document.createElement('div');
-    container.innerHTML = USER_LIST_TEMPLATE;
-    div = container.firstChild;
-    div.setAttribute('id', key);
-    searchNamesList.appendChild(div);
-  }
-  if (picUrl) {
-    div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
-  }
-  div.querySelector('.user-name').textContent = name;
-  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name,picUrl); });
-
-  // Show the card fading-in and scroll to view the new message.
-  setTimeout(function() {div.classList.add('visible')}, 1);
-  searchNamesList.scrollTop = searchNamesList.scrollHeight;
-  //group_array=[];
- // messageInputElement.focus();
-}
-/*function displayUserList(key, uid, name, picUrl, imageUrl) {
+function displayUserList(key, uid, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -595,10 +541,10 @@ function displaySearchedUserList(key,uid,name,picUrl){
   setTimeout(function() {div.classList.add('visible')}, 1);
   UserListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
-}*/
+}
 
 
-/*function displayGroupList(groupId,groupName){
+function displayGroupList(groupId,groupName){
   var div = document.getElementById(groupId);
   console.log(groupId);
   // If an element for that message does not exists yet we create it.
@@ -617,7 +563,7 @@ function displaySearchedUserList(key,uid,name,picUrl){
   setTimeout(function() {div.classList.add('visible')}, 1);
   GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
-}*/
+}
 
 
 function displayGroupMessage(key, name, text, picUrl, imageUrl) {
@@ -721,10 +667,23 @@ function toggleButton() {
   }
 }
 
+// Checks that the Firebase SDK has been correctly setup and configured.
+function checkSetup() {
+  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
+    window.alert('You have not configured and imported the Firebase SDK. ' +
+        'Make sure you go through the codelab setup instructions and make ' +
+        'sure you are running the codelab using `firebase serve`');
+  }
+}
+function sendMe(){
+  window.location = "http://localhost:5000/Dashboard.html";
+}
+
+
 function search_names() {
   var input = searchElement.value;
   //console.log(input);
-  var myNode = searchNamesList;
+  var myNode = UserListElement;
   while (myNode.firstChild) {
       myNode.removeChild(myNode.firstChild);
   }
@@ -734,7 +693,7 @@ function search_names() {
     var list=data.name;
     //console.log(list);
     if(list.substring(0,input.length)==input && input!=""){
-      displaySearchedUserList(snap.key , data.uid , data.name, data.profilePicUrl);
+      displayUserList(snap.key , data.uid , data.name, data.profilePicUrl, data.imageUrl);
     }
     /*for (var i=0;i<list.length;i++){
       if(list[i].substring(0,input.length)==input){
@@ -747,52 +706,87 @@ function search_names() {
   firebase.database().ref().child('/user-profiles/').orderByChild('name').startAt(input).on('child_changed', callback)
 }
 
-// Checks that the Firebase SDK has been correctly setup and configured.
-function checkSetup() {
-  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
-    window.alert('You have not configured and imported the Firebase SDK. ' +
-        'Make sure you go through the codelab setup instructions and make ' +
-        'sure you are running the codelab using `firebase serve`');
-  }
-}
+
 
 // Checks that Firebase has been imported.
 checkSetup();
 
 // Shortcuts to DOM Elements.
-//var signInMessageElement = document.getElementById('msg');
+var messageListElement = document.getElementById('messages');
+var UserListElement = document.getElementById('user-list');
+var GroupListElement = document.getElementById('group-list');
+
+var messageFormElement = document.getElementById('message-form');
+var messageInputElement = document.getElementById('message');
+var submitButtonElement = document.getElementById('submit');
+var imageButtonElement = document.getElementById('submitImage');
+var imageFormElement = document.getElementById('image-form');
+var mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
-//var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-//var nameElement = document.getElementById('name');
-//var saveButtonElement = document.getElementById('save-button');
-//var semElement = document.getElementById('sem');
-//var departElement = document.getElementById('depart');
-//var mobileElement = document.getElementById('mob');
-//var rollElement = document.getElementById('roll');
-//var profPicElement = document.getElementById('prof-pic');
-//var labelElement = document.getElementById('label');
-var createGroupElement = document.getElementById('create-group');
-createGroupElement.addEventListener('click',formGroup);
-var membersListElement = document.getElementById('members');
-//var xElement = document.getElementById('x');
-//saveButtonElement.addEventListener('click',save);
-userPicElement.addEventListener('click',sendMe);
-userNameElement.addEventListener('click',sendMe); 
-// Saves message on form submit.
-signOutButtonElement.addEventListener('click', signOut);
-signInButtonElement.addEventListener('click', signIn);
+var signInSnackbarElement = document.getElementById('must-signin-snackbar');
+var formGroupElement = document.getElementById('group');
+var showChatElement = document.getElementById('showChat');
 
+
+
+
+
+// Group message section
+var groupMessageListElement = document.getElementById('group-messages');
+var groupMessageFormElement = document.getElementById('group-message-form');
+var groupMessageInputElement = document.getElementById('group-message');
+var groupSubmitButtonElement = document.getElementById('group-submit');
+var groupImageButtonElement = document.getElementById('group-submitImage');
+var groupImageFormElement = document.getElementById('group-image-form');
+var groupMediaCaptureElement = document.getElementById('group-mediaCapture');
+var groupNameElement = document.getElementById('group-name');
+groupMessageFormElement.addEventListener('submit', onGroupMessageFormSubmit);
 var searchElement = document.getElementById("search");
 searchElement.addEventListener('keyup', search_names);
-var searchNamesList = document.getElementById('search-names');
+var membersListElement = document.getElementById("members");
+
+
+
+// Toggle for the button.
+groupMessageInputElement.addEventListener('keyup', groupToggleButton);
+groupMessageInputElement.addEventListener('change', groupToggleButton);
+
+// Events for image upload.
+groupImageButtonElement.addEventListener('click', function(e) {
+  e.preventDefault();
+  groupMediaCaptureElement.click();
+});
+groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
+var activeGrouId = null;
+
+
+
+// Saves message on form submit.
+messageFormElement.addEventListener('submit', onMessageFormSubmit);
+signOutButtonElement.addEventListener('click', signOut);
+signInButtonElement.addEventListener('click', signIn);
+formGroupElement.addEventListener('click',formGroup);
+userNameElement.addEventListener('click',sendMe);
+userPicElement.addEventListener('click',sendMe);
+// Toggle for the button.
+messageInputElement.addEventListener('keyup', toggleButton);
+messageInputElement.addEventListener('change', toggleButton);
+
+// Events for image upload.
+imageButtonElement.addEventListener('click', function(e) {
+  e.preventDefault();
+  mediaCaptureElement.click();
+});
+mediaCaptureElement.addEventListener('change', onMediaFileSelected);
+
 // initialize Firebase
 initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
 //loadMessages();
-//loadUserList();
+loadUserList();
 //loadGroupList();
 //console.log(getUserName());
