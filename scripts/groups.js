@@ -596,7 +596,7 @@ function displaySearchedUserList(key,uid,name,picUrl){
   messageInputElement.focus();
 }*/
 function showChat(groupId,groupName){
-    window.location = "http://localhost:5000/showChat.html"; 
+    window.location = "http://localhost:5000/showChat.html"+"?groupID="+groupId; 
 
 }
 
