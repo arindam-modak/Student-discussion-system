@@ -301,7 +301,70 @@ function onMediaFileSelected(event) {
     saveImageMessage(file);
   }
 }
+var currentGroupId;
 
+function leaveGroup(){
+    var url_query = window.location.href;
+    var url = new URL(url_query);
+    var currentGroupId = url.searchParams.get("groupID");
+    var currentuser=firebase.auth().currentUser.uid;
+    //console.log(currentGroupId);
+    //console.log(currentuser);
+    var member=[];
+    firebase.database().ref("/groups/"+currentGroupId).on("value",snap=>{
+          if (snap.exists()){ 
+                member=snap.val().members;
+                //console.log(member);
+                member = member.filter(item => item !== currentuser);
+                //console.log(member);
+                //displayGroupList(snap.key,gname);
+            }
+    });
+    const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
+    sleep(5000).then(() => {
+      console.log(member);
+      firebase.database().ref().child("/groups/"+currentGroupId).update({members : member});
+      member = [];
+      var key;
+      console.log(currentuser);
+      firebase.database().ref("/user-profiles/").orderByChild('uid').equalTo(currentuser).on("value",snap=>{
+          if (snap.exists()){
+              //console.log(snap.val());
+              snap.forEach(function(childSnapshot) {
+                member=childSnapshot.val().memberIn;
+                console.log(member);
+                key=childSnapshot.key;
+                console.log(key);
+                member = member.filter(item => item !== currentGroupId);
+
+                //console.log(member);
+                  
+              });
+            }
+      });
+        const sleep = (milliseconds) => {
+            return new Promise(resolve => setTimeout(resolve, milliseconds))
+        }
+        sleep(5000).then(() => {
+          console.log(member);
+          firebase.database().ref().child("/user-profiles/"+key).update({memberIn : member});
+          window.location="http://localhost:5000/group.html"
+        });
+    });
+      
+    //firebase.database().ref("/groups/"+currentGroupId).update({members:member})
+}
+
+function addMember(){
+    var url_query = window.location.href;
+    var url = new URL(url_query);
+    var currentGroupId = url.searchParams.get("groupID");
+    var currentGroupName = url.searchParams.get("group_Name");
+    //var currentuser=firebase.auth().currentUser.uid;
+    window.location="http://localhost:5000/addMember.html"+"?groupID="+currentGroupId+"&group_Name="+currentGroupName;
+}
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
   e.preventDefault();
@@ -724,7 +787,8 @@ groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
 var activeGrouId = null;
 
 
-
+var leaveGroupElement = document.getElementById('leave-group');
+leaveGroupElement.addEventListener('click',leaveGroup);
 // Saves message on form submit.
 //messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
@@ -732,6 +796,8 @@ signInButtonElement.addEventListener('click', signIn);
 //formGroupElement.addEventListener('click',formGroup);
 userNameElement.addEventListener('click',sendMe);
 userPicElement.addEventListener('click',sendMe);
+var addMemberElement = document.getElementById('add-member');
+addMemberElement.addEventListener('click',addMember);
 // Toggle for the button.
 //messageInputElement.addEventListener('keyup', toggleButton);
 //messageInputElement.addEventListener('change', toggleButton);
@@ -751,3 +817,7 @@ initFirebaseAuth();
 //loadUserList();
 //loadGroupList();
 //console.log(getUserName());
+/*"1IqeXjcpQKNOr8Iun3VEgBL79XX2"
+"o3yu0NbjjueJHgE1HskRQlkw5Ze2"
+"0pz4S8w8pwRYhfnXSt9LJa8Rr3r1"
+"W0hsFADZcxadOTFweAajqPl0AWV2"*/
