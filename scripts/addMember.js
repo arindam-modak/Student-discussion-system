@@ -501,29 +501,28 @@ function formGroup(){
         for(var i=0;i<temp.length;i++){
             member.push(temp[i]);
         }
-        firebase.database().ref().child("/groups/"+key).update({members : member});
+        firebase.database().ref().child("/groups/"+currentGroupId).update({members : member});
         var key;
-        firebase.database().ref("/user-profiles/").orderByChild('uid').equalTo(currentuser).on("value",snap=>{
-          if (snap.exists()){
-              //console.log(snap.val());
-              snap.forEach(function(childSnapshot) {
-                member=childSnapshot.val().memberIn;
-                console.log(member);
-                key=childSnapshot.key;
-                console.log(key);
-                member.push(currentGroupId);
-                //console.log(member);   
+        for(i=0;i<temp.length;i++){
+          var temp2=[];
+          //console.log(temp[i]);
+          var keyy;
+          ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
+            if (snapshot.exists()){ 
+            
+              snapshot.forEach(function(childSnapshot) {
+                keyy = childSnapshot.key;
+                temp2 = childSnapshot.val().memberIn;
               });
+              if(temp2[0]=="001")
+                temp2.pop();
+              temp2.push(currentGroupId);
+              console.log(temp2);
             }
-      });
-        const sleep = (milliseconds) => {
-            return new Promise(resolve => setTimeout(resolve, milliseconds))
-        }
-        sleep(5000).then(() => {
-          console.log(member);
-          firebase.database().ref().child("/user-profiles/"+key).update({memberIn : member});
-          //window.location="http://localhost:5000/group.html"
-        });
+          });
+          console.log(temp2);
+          firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
+        } 
     });
     //console.log(member);
     //for(var i=0;i<temp.length;i++){
