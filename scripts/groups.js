@@ -419,9 +419,9 @@ var SEARCHED_USER_LIST_TEMPLATE =
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
-    '<div class="group-list-container">' +
+    '<div style="margin-top:1%; width: 100%; padding: 15px;box-sizing: border-box;background-color: lightblue;" class="group-list-container">'+
       '<div class="group-spacing"></div>' +
-      '<div class="group-href"><div class="group-name"></div></div>' +
+      '<div class="group-href"><div style="weight=bold;" class="group-name"></div></div>' +
     '</div>';
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
@@ -612,6 +612,12 @@ function displayGroupList(groupId,groupName){
   }
   div.querySelector('.group-name').textContent = groupName;
   div.querySelector('.group-href').setAttribute('id', "heha_"+groupName);
+  div.querySelector('.group-name').addEventListener('mouseover', function(){
+    div.style.opacity = 0.6;
+  });
+  div.querySelector('.group-name').addEventListener('mouseout', function(){
+    div.style.opacity = 1.0;
+  });
   div.querySelector('.group-name').addEventListener('click',function(){ showChat(groupId,groupName);  });
   //div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
   //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });

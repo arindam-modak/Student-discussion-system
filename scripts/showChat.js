@@ -94,6 +94,7 @@ function loadGroupMembersList(currentGroupId) {
   firebase.database().ref('/groups/'+currentGroupId+'/members/').on('child_changed', callback);
 }
 
+// new
 function loadGroupMessages(groupId) {
   activeGrouId = groupId;
   var myNode = groupMessageListElement;
@@ -103,6 +104,8 @@ function loadGroupMessages(groupId) {
   var callback = function(snap) {
     var data = snap.val();
     displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
+    if(currentScrollKey==null)
+      currentScrollKey = snap.key;
   };
   firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_changed', callback);
@@ -738,6 +741,88 @@ function checkSetup() {
 function sendMe(){
   window.location = "http://localhost:5000/Dashboard.html";
 }
+
+
+
+
+// new
+var oldDiv = null;
+function displayOldGroupMessage(key, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(key);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = MESSAGE_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', key);
+    if(oldDiv==null) {
+      groupMessageListElement.prepend(div);
+      oldDiv = div;
+    }
+    else {
+      oldDiv.parentNode.insertBefore(div, oldDiv.nextSibling);
+      oldDiv = div;
+    }
+  }
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.name').textContent = name;
+  var groupMessageElement = div.querySelector('.message');
+  if (text) { // If the message is text.
+    groupMessageElement.textContent = text;
+    // Replace all line breaks by <br>.
+    groupMessageElement.innerHTML = groupMessageElement.innerHTML.replace(/\n/g, '<br>');
+  } else if (imageUrl) { // If the message is an image.
+    var image = document.createElement('img');
+    image.addEventListener('load', function() {
+      groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+    });
+    image.src = imageUrl + '&' + new Date().getTime();
+    groupMessageElement.innerHTML = '';
+    groupMessageElement.appendChild(image);
+  }
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  //groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+  groupMessageInputElement.focus();
+}
+
+function loadOldGroupMessages(event) {
+
+        var delta;
+        var snap_array = [];
+        oldDiv = null;
+        if (event.wheelDelta){
+            delta = event.wheelDelta;
+        }else{
+            delta = -1 * event.deltaY;
+        }
+        
+        if (delta > 0){
+            //activeGrouId = groupId;
+            var tempKey = currentScrollKey;
+            var last_key = null;
+            var callback = function(snap) {
+              snap_array.push(snap);
+              var data = snap.val();
+              //console.log(data);
+              displayOldGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
+              if(last_key==null) {
+                currentScrollKey = snap.key;
+                last_key = true;
+              }
+            };
+            firebase.database().ref('/groups/'+activeGrouId+'/messages/').orderByKey().endAt(tempKey).limitToLast(4).on('child_added', callback);
+            firebase.database().ref('/groups/'+activeGrouId+'/messages/').orderByKey().endAt(tempKey).limitToLast(4).on('child_changed', callback);
+        }
+
+        //console.log(snap_array);
+
+}
+
+
+
 // Checks that Firebase has been imported.
 checkSetup();
 
@@ -784,6 +869,7 @@ groupImageButtonElement.addEventListener('click', function(e) {
   groupMediaCaptureElement.click();
 });
 groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
+
 var activeGrouId = null;
 
 
@@ -798,6 +884,12 @@ userNameElement.addEventListener('click',sendMe);
 userPicElement.addEventListener('click',sendMe);
 var addMemberElement = document.getElementById('add-member');
 addMemberElement.addEventListener('click',addMember);
+
+
+
+// new
+var currentScrollKey = null;
+groupMessageListElement.addEventListener('wheel',loadOldGroupMessages);
 // Toggle for the button.
 //messageInputElement.addEventListener('keyup', toggleButton);
 //messageInputElement.addEventListener('change', toggleButton);
