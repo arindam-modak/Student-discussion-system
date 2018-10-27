@@ -497,17 +497,19 @@ function formGroup(){
             return new Promise(resolve => setTimeout(resolve, milliseconds))
     }
     sleep(5000).then(() => {
-        console.log(member);
+        //console.log(member);
         for(var i=0;i<temp.length;i++){
             member.push(temp[i]);
         }
+        console.log(member);
         firebase.database().ref().child("/groups/"+currentGroupId).update({members : member});
         var key;
-        for(i=0;i<temp.length;i++){
+        console.log(temp);
+        for( var i=0;i<temp.length;i++){
           var temp2=[];
-          //console.log(temp[i]);
+          console.log(temp[i]);
           var keyy;
-          ref.orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
+          firebase.database().ref('/user-profiles/').orderByChild("uid").equalTo(temp[i]).on("value",snapshot => {
             if (snapshot.exists()){ 
             
               snapshot.forEach(function(childSnapshot) {
@@ -522,13 +524,14 @@ function formGroup(){
           });
           console.log(temp2);
           firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
-        } 
+        }
+        group_array=[];
+        window.location="http://localhost:5000/group.html" 
     });
     //console.log(member);
     //for(var i=0;i<temp.length;i++){
 
     //}
-    //group_array=[];
 
 } 
 
