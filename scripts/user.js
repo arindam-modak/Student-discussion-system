@@ -55,12 +55,13 @@ function save(){
           snapshot.forEach(function(childSnapshot) {
                   //console.log(childSnapshot.val().memberIn);
             console.log(childSnapshot.key);
-            //console.log(temp2);
+            console.log(rollElement.value);
               firebase.database().ref('/user-profiles/'+childSnapshot.key).update({
                 roll: rollElement.value,
                 semester: semElement.value,
                 mobile : mobileElement.value,
-                depart: departElement.value
+                depart: departElement.value,
+                bio: bioElement.value
               }).catch(function(error) {
                 console.error('Error writing new message to Firebase Database', error);
               });
@@ -723,6 +724,7 @@ var semElement = document.getElementById('sem');
 var departElement = document.getElementById('depart');
 var mobileElement = document.getElementById('mob');
 var rollElement = document.getElementById('roll');
+var bioElement = document.getElementById('bio');
 var profPicElement = document.getElementById('prof-pic');
 //var labelElement = document.getElementById('label');
 
