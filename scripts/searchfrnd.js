@@ -332,11 +332,6 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-    var url_query = window.location.href;
-    var url = new URL(url_query);
-    var currentGroupId = url.searchParams.get("groupID");
-    var currentGroupName = url.searchParams.get("group_Name");
-    groupNameElement.setAttribute('value',currentGroupName);
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
@@ -387,9 +382,9 @@ var MESSAGE_TEMPLATE =
     '</div>';
 
 var USER_LIST_TEMPLATE =
-    '<div class="user-list-container">' +
-      '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div></div>' +
+    '<div style="white-space:nowrap;padding:5px;" class="user-list-container">' +
+      '<div style="display:inline;" class="user-pic"><img class="image" style="height:25px; width:25px;border-radius:10%"></div>' +
+      '<div style="display:inline;" class="user-name"></div>' +
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
@@ -457,26 +452,6 @@ function removeMember(uid,name,div){
 }
 
 var group_array=[];
-function addGroupMember(uid,name) {
-  group_array.push(uid);
-  //console.log(group_array);
-  var div = document.getElementById('U'+uid);
-  // If an element for that message does not exists yet we create it.
-  if (!div) {
-    var container = document.createElement('div');
-    container.innerHTML = SEARCHED_USER_LIST_TEMPLATE;
-    div = container.firstChild;
-    div.setAttribute('id', "A"+uid);
-    membersListElement.appendChild(div);
-  }
-  div.querySelector('.user-name').textContent = name;
-  div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
-  //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
-
-  // Show the card fading-in and scroll to view the new message.
-  //setTimeout(function() {div.classList.add('visible')}, 1);
-  membersListElement.scrollTop = membersListElement.scrollHeight;
-}
 
 //var count=1;
 function formGroup(){
@@ -544,6 +519,9 @@ function formGroup(){
 
 } 
 
+function showProfile(uid,name){
+  window.location="http://localhost:5000/profile.html"+"?userID="+uid;
+}
 function displayUserList(key, uid, name, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
@@ -558,13 +536,12 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
     div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
   }
   div.querySelector('.user-name').textContent = name;
-  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
-  div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+  div.querySelector('.image').setAttribute('src',picUrl);
+  div.querySelector('.user-name').addEventListener('click', function(){ showProfile(uid,name); });
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
-  UserListElement.scrollTop = messageListElement.scrollHeight;
-  messageInputElement.focus();
+  UserListElement.scrollTop = UserListElement.scrollHeight;
 }
 
 
@@ -736,75 +713,36 @@ function search_names() {
 checkSetup();
 
 // Shortcuts to DOM Elements.
-var messageListElement = document.getElementById('messages');
-var UserListElement = document.getElementById('user-list');
-var GroupListElement = document.getElementById('group-list');
 
-var messageFormElement = document.getElementById('message-form');
-var messageInputElement = document.getElementById('message');
-var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
-var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-var formGroupElement = document.getElementById('group');
-var showChatElement = document.getElementById('showChat');
-
-
+var searchElement = document.getElementById('search');
+searchElement.addEventListener('keyup', search_names);
 
 
 
 // Group message section
-var groupMessageListElement = document.getElementById('group-messages');
-var groupMessageFormElement = document.getElementById('group-message-form');
-var groupMessageInputElement = document.getElementById('group-message');
-var groupSubmitButtonElement = document.getElementById('group-submit');
-var groupImageButtonElement = document.getElementById('group-submitImage');
-var groupImageFormElement = document.getElementById('group-image-form');
-var groupMediaCaptureElement = document.getElementById('group-mediaCapture');
-var groupNameElement = document.getElementById('group-name');
-groupMessageFormElement.addEventListener('submit', onGroupMessageFormSubmit);
-var searchElement = document.getElementById("search");
-searchElement.addEventListener('keyup', search_names);
-var membersListElement = document.getElementById("members");
+
 
 
 
 // Toggle for the button.
-groupMessageInputElement.addEventListener('keyup', groupToggleButton);
-groupMessageInputElement.addEventListener('change', groupToggleButton);
-
-// Events for image upload.
-groupImageButtonElement.addEventListener('click', function(e) {
-  e.preventDefault();
-  groupMediaCaptureElement.click();
-});
-groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
-var activeGrouId = null;
 
 
 
 // Saves message on form submit.
-messageFormElement.addEventListener('submit', onMessageFormSubmit);
+//var messageListElement = document.getElementById('messages');
+var UserListElement = document.getElementById('user-list');
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
-formGroupElement.addEventListener('click',formGroup);
 userNameElement.addEventListener('click',sendMe);
 userPicElement.addEventListener('click',sendMe);
 // Toggle for the button.
-messageInputElement.addEventListener('keyup', toggleButton);
-messageInputElement.addEventListener('change', toggleButton);
 
 // Events for image upload.
-imageButtonElement.addEventListener('click', function(e) {
-  e.preventDefault();
-  mediaCaptureElement.click();
-});
-mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 // initialize Firebase
 initFirebaseAuth();
