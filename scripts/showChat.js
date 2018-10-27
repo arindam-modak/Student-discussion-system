@@ -451,9 +451,10 @@ var MESSAGE_TEMPLATE =
     '</div>';
 
 var USER_LIST_TEMPLATE =
-    '<div class="user-list-container">' +
-      '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div></div>' +
+    '<div style="background-color:#E9EBEC;white-space:nowrap;margin-bottom:10px;" class="user-list-container">' +
+      '<div style="display:inline;" class="user-pic"><img class="image" style="height:25px; width:25px;border-radius:10%"></div>' +
+      '<div style="display:inline; margin-left:5px;" class="user-name"></div>' +
+      '<div style="display:inline;float: right;" ><button style="background-color:rgb(3,155,229);color:white;border-radius:20%;" class="remove">x</button></div>'+
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
@@ -576,6 +577,11 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
   UserListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
+function removeThisMember(uid,div){
+  UserListElement.removeChild(div);
+  
+}
+
 function  displayGroupMembersList(key ,name){
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
@@ -594,10 +600,12 @@ function  displayGroupMembersList(key ,name){
             name2 = childSnapshot.val().name;
             console.log(name2);
             div.querySelector('.user-name').textContent = name2;
+            div.querySelector('.image').setAttribute('src',childSnapshot.val().profilePicUrl);
           });
          
       }
     });
+    div.querySelector('.remove').addEventListener('click',function(){removeThisMember(uid,div);});
     //div.querySelector('.user-href').setAttribute('id', "heha_"+name2);
   //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
 
