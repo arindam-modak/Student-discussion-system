@@ -515,6 +515,17 @@ function formGroup(){
     //console.log(gid);
       if(keyy!=null)
         firebase.database().ref().child("/user-profiles/"+keyy).update({memberIn : temp2});
+      if(temp[i]!=firebase.auth().currentUser.uid){
+        firebase.database().ref("/notifiactions/").push({
+          groupId : gid,
+          is_seen : "No",
+          uid : temp[i],
+          admin : getUserName(),
+          date : new Date().toLocaleString()  
+        }).catch(function(error) {
+              console.error('Error writing new message to Firebase Database', error);
+        });
+      }
     } 
     group_array=[];
 

@@ -70,14 +70,13 @@
       </div>
     </div>
   </header>
-
   <main class="mdl-layout__content mdl-color--grey-100">
       <div class="sidebar">
         <a href="Dashboard.html">Dashborad</a>
         <a href="user2.html">Profile</a>
         <a href="group.html">Groups</a>
         <a href="addGroup.html">Add Group</a>
-        <a href="#">Notifications</a>
+        <a href="notification.html">Notifications</a>
       </div>
       <div id="messages-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
       <!-- Messages container -->
@@ -180,7 +179,13 @@
 <script src="/__/firebase/5.4.0/firebase-storage.js"></script>
 <script src="/__/firebase/5.4.0/firebase-messaging.js"></script>
 <script src="/__/firebase/init.js"></script>
-
+<script>
+ close = document.getElementById("close");
+ close.addEventListener('click', function() {
+   note = document.getElementById("note");
+   note.style.display = 'none';
+ }, false);
+</script>
 <script src="scripts/main.js"></script>
 </body>
 </html>
