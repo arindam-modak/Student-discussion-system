@@ -82,8 +82,6 @@
 
       <div class="text-center">
         <img id="prof-pic" class="avatar img-circle img-thumbnail" alt="avatar">
-        <h6>Upload a different photo...</h6>
-        <input type="file" class="text-center center-block file-upload">
       </div></hr><br>
 
     
@@ -93,7 +91,7 @@
           <div class="tab-content">
             <div class="tab-pane active" id="home">
                 <hr>
-                  <form class="form" action="##" method="post" id="registrationForm">
+                  <form class="form" id="registrationForm">
                       <div class="form-group">
                           
                           <div class="col-xs-9">
@@ -131,9 +129,15 @@
                           </div>
                       </div>
                       <div class="form-group">
+                          <div class="col-xs-9">
+                              <label for="email"><h4>Bio</h4></label>
+                              <input type="text" class="form-control" name="email" id="bio" placeholder="Bio" title="enter your Bio">
+                          </div>
+                      </div>
+                      <div class="form-group">
                            <div class="col-xs-12">
                                 <br>
-                                <button id="save-button" style="background-color: rgb(3,155,229);"class="btn btn-lg btn-success"><i class="glyphicon glyphicon-ok-sign"></i> Save</button>
+                                <div id="save-button" style="background-color: rgb(3,155,229);" class="btn btn-lg btn-success"><i class="glyphicon glyphicon-ok-sign"></i> Save</div>
                             </div>
                       </div>
                       <div hidden id="label"></div>

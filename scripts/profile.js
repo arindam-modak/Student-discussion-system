@@ -384,16 +384,27 @@ function authStateObserver(user) {
           snapshot.forEach(function(childSnapshot) {
             //console.log(childSnapshot.key);
             var data = childSnapshot.val();
+            console.log(data);
             profpic = data.profilePicUrl;
             name = data.name;
             nameElement.setAttribute('value',name);
             profPicElement.setAttribute('src',profpic);
             if(data.roll){
               rollElement.setAttribute('value',data.roll);
+            }
+            if(data.semester){
               semElement.setAttribute('value',data.semester);
+            }
+            if(data.depart){
               departElement.setAttribute('value',data.depart);
+            }
+            if(data.mobile){
               mobileElement.setAttribute('value',data.mobile);
             }
+            if(data.bio){
+              bioElement.setAttribute('value',data.bio);
+            }
+
           });
     });
     //currentUserID = firebase.auth().currentUser.uid;
@@ -732,6 +743,7 @@ var semElement = document.getElementById('sem');
 var departElement = document.getElementById('depart');
 var mobileElement = document.getElementById('mob');
 var rollElement = document.getElementById('roll');
+var bioElement = document.getElementById('bio');
 var profPicElement = document.getElementById('prof-pic');
 //var labelElement = document.getElementById('label');
 
