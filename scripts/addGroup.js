@@ -382,9 +382,9 @@ var MESSAGE_TEMPLATE =
     '</div>';
 
 var USER_LIST_TEMPLATE =
-    '<div class="user-list-container">' +
-      '<div class="user-spacing"><div class="user-pic"></div></div>' +
-      '<div class="user-href"><div class="user-name"></div></div>' +
+    '<div style="height:22px;background-color:#E9EBEC;white-space:nowrap;margin-bottom:10px;" class="user-list-container">' +
+      '<div style="display:inline;" class="user-pic"><img class="image" style="height:22px; width:22px;border-radius:10%"></div>' +
+      '<div style="display:inline;margin-left:5px;font-size:18px;weight:bold;" class="user-name"></div>' +
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
@@ -545,8 +545,8 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
     div.querySelector('.user-pic').style.backgroundImage = 'url(' + picUrl + ')';
   }
   div.querySelector('.user-name').textContent = name;
-  div.querySelector('.user-href').setAttribute('id', "heha_"+name);
   div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+  div.querySelector('.image').setAttribute('src',picUrl);
 
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);

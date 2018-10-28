@@ -382,9 +382,9 @@ var MESSAGE_TEMPLATE =
     '</div>';
 
 var USER_LIST_TEMPLATE =
-    '<div style="white-space:nowrap;padding:5px;" class="user-list-container">' +
-      '<div style="display:inline;" class="user-pic"><img class="image" style="height:25px; width:25px;border-radius:10%"></div>' +
-      '<div style="display:inline;" class="user-name"></div>' +
+    '<div style="height:30px;background-color:#E9EBEC;white-space:nowrap;margin-bottom:10px;" class="user-list-container">' +
+      '<div style="display:inline;" class="user-pic"><img class="image" style="height:30px; width:30px;border-radius:10%"></div>' +
+      '<div style="display:inline;margin-left:5px;font-size:20px;weight:bold;" class="user-name"></div>' +
     '</div>';
 
 var GROUP_LIST_TEMPLATE =
