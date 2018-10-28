@@ -362,6 +362,7 @@ function sendMe(){
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
+    var currUid=firebase.auth().currentUser.uid;
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
     var rollno;
@@ -399,6 +400,13 @@ function authStateObserver(user) {
     signInButtonElement.setAttribute('hidden', 'true');
     nameElement.setAttribute('value',userName);
     profPicElement.setAttribute('src',profilePicUrl);
+    firebase.database().ref('/notifications/').orderBychild('uid').equalTo(currUid).once('value',snap=>{
+      if(snap.exists()){
+        console.log(snap.val());
+      }
+
+
+    });
     //emailElement.setAttribute('value',userEmail);
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();

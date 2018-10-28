@@ -320,7 +320,7 @@ function onMessageFormSubmit(e) {
   }
 }
 function sendMe(){
-  window.location = "http://localhost:5000/Dashboard.html";
+  window.location = "http://localhost:5000/user2.html";
 }
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
