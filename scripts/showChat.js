@@ -88,6 +88,7 @@ function loadGroupMembersList(currentGroupId) {
   // Loads the last 12 messages and listen for new ones.
   var callback = function(snap) {
     var data = snap.val();
+    console.log(data);
     displayGroupMembersList(snap.key , data);
   };
   firebase.database().ref('/groups/'+currentGroupId+'/members/').on('child_added', callback);
@@ -579,26 +580,59 @@ function displayUserList(key, uid, name, picUrl, imageUrl) {
 }
 function removeThisMember(uid,div){
   UserListElement.removeChild(div);
-  
+  var url_query = window.location.href;
+  var url = new URL(url_query);
+  var currentGroupId = url.searchParams.get("groupID");
+  var temp=[];
+  firebase.database().ref('/groups/'+currentGroupId).once('value',snap=>{
+      if(snap.exists()){
+        var data=snap.val();
+        temp=data.members;
+        temp=temp.filter(item => item !== uid);
+      }
+
+  });
+  const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds))
+  }
+  sleep(5000).then(() => {
+    firebase.database().ref().child('/groups/'+currentGroupId).update({members:temp});
+    temp=[];
+    var key;
+    firebase.database().ref('/user-profiles/').orderByChild('uid').equalTo(uid).once('value',snap=>{
+      if(snap.exists()){
+          snap.forEach(function(childSnapshot){
+              var data=childSnapshot.val();
+              temp=data.memberIn;
+              key=childSnapshot.key;
+              temp=temp.filter(item => item !== currentGroupId);
+          });
+      }
+    });
+    sleep(5000).then(() => {
+      firebase.database().ref().child('/user-profiles/'+key).update({memberIn:temp});
+    });
+  });
 }
 
-function  displayGroupMembersList(key ,name){
-  var div = document.getElementById(key);
+function  displayGroupMembersList(key ,uid){
+  var div = document.getElementById(uid);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = USER_LIST_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
+    div.setAttribute('id', uid);
     UserListElement.appendChild(div);
   }
   var name2;
-  firebase.database().ref("/user-profiles/").orderByChild("uid").equalTo(name).on("value",snapshot => {
+  firebase.database().ref("/user-profiles/").orderByChild("uid").equalTo(uid).on("value",snapshot => {
       if (snapshot.exists()){ 
         //console.log(snapshot.val());
         snapshot.forEach(function(childSnapshot) {
             name2 = childSnapshot.val().name;
-            console.log(name2);
+            //console.log(name2);
+
             div.querySelector('.user-name').textContent = name2;
             div.querySelector('.image').setAttribute('src',childSnapshot.val().profilePicUrl);
           });
