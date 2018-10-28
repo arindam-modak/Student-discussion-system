@@ -104,7 +104,7 @@ function loadGroupMessages(groupId) {
   }
   var callback = function(snap) {
     var data = snap.val();
-    displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
+    displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl, data.docUrl);
     if(currentScrollKey==null)
       currentScrollKey = snap.key;
   };
@@ -244,6 +244,32 @@ function groupsaveImageMessage(file,groupId) {
   });
 }
 
+function groupsaveDocMessage(file,groupId) {
+  // 1 - We add a message with a loading icon that will get updated with the shared image.
+  firebase.database().ref('/groups/'+groupId+'/messages').push({
+    uid: firebase.auth().currentUser.uid,
+    name: getUserName(),
+    docUrl: LOADING_IMAGE_URL,
+    profilePicUrl: getProfilePicUrl(),
+    date: new Date().toLocaleString()
+  }).then(function(messageRef) {
+    // 2 - Upload the image to Cloud Storage.
+    var filePath = firebase.auth().currentUser.uid + '/' + messageRef.key + '/' + file.name;
+    return firebase.storage().ref(filePath).put(file).then(function(fileSnapshot) {
+      // 3 - Generate a public URL for the file.
+      return fileSnapshot.ref.getDownloadURL().then((url) => {
+        // 4 - Update the chat message placeholder with the image’s URL.
+        console.log(url);
+        return messageRef.update({
+          docUrl: url,
+          storageUri: fileSnapshot.metadata.fullPath
+        });
+      });
+    });
+  }).catch(function(error) {
+    console.error('There was an error uploading a file to Cloud Storage:', error);
+  });
+}
 
 
 
@@ -671,7 +697,7 @@ function displayGroupList(groupId,groupName){
 }
 
 
-function displayGroupMessage(key, name, text, picUrl, imageUrl) {
+function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -698,6 +724,15 @@ function displayGroupMessage(key, name, text, picUrl, imageUrl) {
     image.src = imageUrl + '&' + new Date().getTime();
     groupMessageElement.innerHTML = '';
     groupMessageElement.appendChild(image);
+  } else if (docUrl) { // If the message is an image.
+    var doc = document.createElement('embed');
+    doc.addEventListener('load', function() {
+      groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+    });
+    doc.src = docUrl + '&' + new Date().getTime();
+    doc.type="application/pdf";
+    groupMessageElement.innerHTML = '';
+    groupMessageElement.appendChild(doc);
   }
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
@@ -730,6 +765,28 @@ function onGroupMediaFileSelected(event) {
   // Check if the user is signed-in
   if (checkSignedInWithMessage()) {
     groupsaveImageMessage(file,activeGrouId);
+  }
+}
+
+function onGroupDocFileSelected(event) {
+  event.preventDefault();
+  var file = event.target.files[0];
+
+  // Clear the selection in the file picker input.
+  groupDocFormElement.reset();
+
+  // Check if the file is an image.
+  /*if (!file.type.match('image.*')) {
+    var data = {
+      message: 'You can only share images',
+      timeout: 2000
+    };
+    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+    return;
+  }*/
+  // Check if the user is signed-in
+  if (checkSignedInWithMessage()) {
+    groupsaveDocMessage(file,activeGrouId);
   }
 }
 
@@ -911,6 +968,23 @@ groupImageButtonElement.addEventListener('click', function(e) {
   groupMediaCaptureElement.click();
 });
 groupMediaCaptureElement.addEventListener('change', onGroupMediaFileSelected);
+
+
+
+var groupDocButtonElement = document.getElementById('group-submitDoc');
+var groupDocFormElement = document.getElementById('group-doc-form');
+var groupDocCaptureElement = document.getElementById('group-docCapture');
+
+// Events for image upload.
+groupDocButtonElement.addEventListener('click', function(e) {
+  e.preventDefault();
+  groupDocCaptureElement.click();
+});
+groupDocCaptureElement.addEventListener('change', onGroupDocFileSelected);
+
+
+
+
 
 var activeGrouId = null;
 
