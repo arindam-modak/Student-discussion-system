@@ -220,22 +220,22 @@ div.content {
 #message-form, #group-message-form {
   display: flex;
   flex-direction: row;
-  width: calc(100% - 48px);
+  width: calc(100% - 100px);
   float: left;
 }
-#image-form,#group-image-form {
+#image-form,#group-image-form, #group-doc-form{
   display: flex;
   flex-direction: row;
   width: 48px;
-  float: right;
+  float: left;
 }
 #message-form .mdl-textfield {
   width: calc(100% - 100px);
 }
 #group-message-form .mdl-textfield {
-  width: calc(100% - 100px);
+  width: calc(100% - 110px);
 }
-#message-form button, #image-form button, #group-message-form button, #group-image-form button {
+#message-form button, #image-form button, #group-message-form button, #group-image-form button, #group-doc-form button {
   width: 100px;
   margin: 15px 0 0 10px;
 }
@@ -286,17 +286,26 @@ div.content {
   padding: 0 6px 0 1px;
   min-width: 0;
 }
+
+#group-doc-form #group-submitDoc {
+  width: auto;
+  padding: 0 6px 0 1px;
+  min-width: 0;
+}
 #image-form #submitImage .material-icons {
   top: -1px;
 }
 #group-image-form #group-submitImage .material-icons {
   top: -1px;
 }
+#group-doc-form #group-submitDoc .material-icons {
+  top: -1px;
+}
 .message img {
   max-width: 300px;
   max-height: 200px;
 }
-#mediaCapture,#group-mediaCapture {
+#mediaCapture,#group-mediaCapture, #group-docCapture {
   display: none;
 }
 @media screen and (max-width: 610px) {
