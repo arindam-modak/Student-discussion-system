@@ -400,9 +400,20 @@ function authStateObserver(user) {
     signInButtonElement.setAttribute('hidden', 'true');
     nameElement.setAttribute('value',userName);
     profPicElement.setAttribute('src',profilePicUrl);
-    firebase.database().ref('/notifications/').orderBychild('uid').equalTo(currUid).once('value',snap=>{
+    firebase.database().ref('/notifiactions/').orderByChild('uid').equalTo(currUid).once('value',snap=>{
       if(snap.exists()){
-        console.log(snap.val());
+        
+        snap.forEach(function(childSnapshot){
+            if(childSnapshot.exists()){
+              if(childSnapshot.val().is_seen=="No"){
+                document.getElementById('notification').style.color='red';
+              }
+            }
+
+
+        });
+
+
       }
 
 
