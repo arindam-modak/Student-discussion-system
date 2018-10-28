@@ -342,6 +342,12 @@ function authStateObserver(user) {
     saveMessagingDeviceToken();
 
 
+    firebase.database().ref("/groups/"+currentGroupId).on('value',snap=>{
+      if(snap.exists()){
+          oldMembers = snap.val().members;
+      }
+    });
+
     //loadGroupList();
 
 
@@ -457,25 +463,29 @@ function removeMember(uid,name,div){
 }
 
 var group_array=[];
+var oldMembers=[];
 function addGroupMember(uid,name) {
-  group_array.push(uid);
-  //console.log(group_array);
-  var div = document.getElementById('U'+uid);
-  // If an element for that message does not exists yet we create it.
-  if (!div) {
-    var container = document.createElement('div');
-    container.innerHTML = SEARCHED_USER_LIST_TEMPLATE;
-    div = container.firstChild;
-    div.setAttribute('id', "A"+uid);
-    membersListElement.appendChild(div);
-  }
-  div.querySelector('.user-name').textContent = name;
-  div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
-  //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+  if(group_array.indexOf(uid)==-1 && oldMembers.indexOf(uid)==-1) {
+    group_array.push(uid);
 
-  // Show the card fading-in and scroll to view the new message.
-  //setTimeout(function() {div.classList.add('visible')}, 1);
-  membersListElement.scrollTop = membersListElement.scrollHeight;
+  //console.log(group_array);
+    var div = document.getElementById('U'+uid);
+    // If an element for that message does not exists yet we create it.
+    if (!div) {
+      var container = document.createElement('div');
+      container.innerHTML = SEARCHED_USER_LIST_TEMPLATE;
+      div = container.firstChild;
+      div.setAttribute('id', "A"+uid);
+      membersListElement.appendChild(div);
+    }
+    div.querySelector('.user-name').textContent = name;
+    div.querySelector('.x').addEventListener('click',function(){  removeMember(uid,name,div);  });
+    //div.querySelector('.user-name').addEventListener('click', function(){ addGroupMember(uid,name); });
+
+    // Show the card fading-in and scroll to view the new message.
+    //setTimeout(function() {div.classList.add('visible')}, 1);
+    membersListElement.scrollTop = membersListElement.scrollHeight;
+  }
 }
 
 //var count=1;
