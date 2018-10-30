@@ -356,14 +356,29 @@ function authStateObserver(user) {
     //signInMessageElement.removeAttribute('hidden');
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
+    var currUid=firebase.auth().currentUser.uid;
+    firebase.database().ref('/notifiactions/').orderByChild('uid').equalTo(currUid).once('value',snap=>{
+      if(snap.exists()){
+        
+        snap.forEach(function(childSnapshot){
+            if(childSnapshot.exists()){
+              if(childSnapshot.val().is_seen=="No"){
+                document.getElementById('notification').style.color='red';
+              }
+            }
+
+        });
+
+
+      }
+
+      loadGroupList();
+    });
     //nameElement.setAttribute('value',userName);
     //profPicElement.setAttribute('src',profilePicUrl);
     //emailElement.setAttribute('value',userEmail);
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
-
-
-    loadGroupList();
 
   } else { // User is signed out!
     // Hide user's profile and sign-out button.

@@ -332,6 +332,7 @@ div.content {
 }
 .mdl-textfield--floating-label.is-focused .mdl-textfield__label {
   color: #0288D1;
+  margin-top: -4px;
 }
 .mdl-button .material-icons {
   top: -1px;

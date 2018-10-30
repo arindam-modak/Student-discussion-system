@@ -332,6 +332,25 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
+    var currUid=firebase.auth().currentUser.uid;
+    firebase.database().ref('/notifiactions/').orderByChild('uid').equalTo(currUid).once('value',snap=>{
+      if(snap.exists()){
+        
+        snap.forEach(function(childSnapshot){
+            if(childSnapshot.exists()){
+              if(childSnapshot.val().is_seen=="No"){
+                document.getElementById('notification').style.color='red';
+              }
+            }
+
+
+        });
+
+
+      }
+
+
+    });
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();

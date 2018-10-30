@@ -104,7 +104,7 @@ function loadGroupMessages(groupId) {
   }
   var callback = function(snap) {
     var data = snap.val();
-    displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl, data.docUrl);
+    displayGroupMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl, data.docUrl,data.uid);
     if(currentScrollKey==null)
       currentScrollKey = snap.key;
   };
@@ -425,14 +425,31 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
+    var currUid=firebase.auth().currentUser.uid;
+    firebase.database().ref('/notifiactions/').orderByChild('uid').equalTo(currUid).once('value',snap=>{
+      if(snap.exists()){
+        
+        snap.forEach(function(childSnapshot){
+            if(childSnapshot.exists()){
+              if(childSnapshot.val().is_seen=="No"){
+                document.getElementById('notification').style.color='red';
+              }
+            }
 
+
+        });
+
+
+      }
+              var url_query = window.location.href;
+              var url = new URL(url_query);
+              var currentGroupId = url.searchParams.get("groupID");
+              loadGroupMessages(currentGroupId);
+              loadGroupMembersList(currentGroupId);
+
+    });
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
-    var url_query = window.location.href;
-    var url = new URL(url_query);
-    var currentGroupId = url.searchParams.get("groupID");
-    loadGroupMessages(currentGroupId);
-    loadGroupMembersList(currentGroupId);
     //loadGroupList();
 
 
@@ -697,7 +714,7 @@ function displayGroupList(groupId,groupName){
 }
 
 
-function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl) {
+function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl,uid) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -710,34 +727,72 @@ function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl) {
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
   }
-  div.querySelector('.name').textContent = name;
-  var groupMessageElement = div.querySelector('.message');
-  if (text) { // If the message is text.
-    groupMessageElement.textContent = text;
-    // Replace all line breaks by <br>.
-    groupMessageElement.innerHTML = groupMessageElement.innerHTML.replace(/\n/g, '<br>');
-  } else if (imageUrl) { // If the message is an image.
-    var image = document.createElement('img');
-    image.addEventListener('load', function() {
+  if(uid==firebase.auth().currentUser.uid){
+      //document.getElementById('group-messages').style.float="right";
+      //document.getElementById('group-messages').style.color="red";
+      //groupMessageElement.style.float="right";
+      div.querySelector('.name').textContent = name;
+      //div.querySelector('.name').style.right="-100px";
+      div.style.backgroundColor="#21f2d9";
+      var groupMessageElement = div.querySelector('.message');
+      if (text) { // If the message is text.
+        groupMessageElement.textContent = text;
+        //groupMessageElement.style.right="-100%";
+        // Replace all line breaks by <br>.
+        groupMessageElement.innerHTML = groupMessageElement.innerHTML.replace(/\n/g, '<br>');
+      } else if (imageUrl) { // If the message is an image.
+        var image = document.createElement('img');
+        image.addEventListener('load', function() {
+          groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+        });
+        image.src = imageUrl + '&' + new Date().getTime();
+        groupMessageElement.innerHTML = '';
+        groupMessageElement.appendChild(image);
+      } else if (docUrl) { // If the message is an image.
+        var doc = document.createElement('embed');
+        doc.addEventListener('load', function() {
+          groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+        });
+        doc.src = docUrl + '&' + new Date().getTime();
+        doc.type="application/pdf";
+        groupMessageElement.innerHTML = '';
+        groupMessageElement.appendChild(doc);
+      }
+      // Show the card fading-in and scroll to view the new message.
+      setTimeout(function() {div.classList.add('visible')}, 1);
       groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
-    });
-    image.src = imageUrl + '&' + new Date().getTime();
-    groupMessageElement.innerHTML = '';
-    groupMessageElement.appendChild(image);
-  } else if (docUrl) { // If the message is an image.
-    var doc = document.createElement('embed');
-    doc.addEventListener('load', function() {
-      groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
-    });
-    doc.src = docUrl + '&' + new Date().getTime();
-    doc.type="application/pdf";
-    groupMessageElement.innerHTML = '';
-    groupMessageElement.appendChild(doc);
+      groupMessageInputElement.focus();
   }
-  // Show the card fading-in and scroll to view the new message.
-  setTimeout(function() {div.classList.add('visible')}, 1);
-  groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
-  groupMessageInputElement.focus();
+  else{
+    div.querySelector('.name').textContent = name;
+    var groupMessageElement = div.querySelector('.message');
+    if (text) { // If the message is text.
+      groupMessageElement.textContent = text;
+      // Replace all line breaks by <br>.
+      groupMessageElement.innerHTML = groupMessageElement.innerHTML.replace(/\n/g, '<br>');
+    } else if (imageUrl) { // If the message is an image.
+      var image = document.createElement('img');
+      image.addEventListener('load', function() {
+        groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+      });
+      image.src = imageUrl + '&' + new Date().getTime();
+      groupMessageElement.innerHTML = '';
+      groupMessageElement.appendChild(image);
+    } else if (docUrl) { // If the message is an image.
+      var doc = document.createElement('embed');
+      doc.addEventListener('load', function() {
+        groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+      });
+      doc.src = docUrl + '&' + new Date().getTime();
+      doc.type="application/pdf";
+      groupMessageElement.innerHTML = '';
+      groupMessageElement.appendChild(doc);
+    }
+    // Show the card fading-in and scroll to view the new message.
+    setTimeout(function() {div.classList.add('visible')}, 1);
+    groupMessageListElement.scrollTop = groupMessageListElement.scrollHeight;
+    groupMessageInputElement.focus();
+  }
 }
 
 

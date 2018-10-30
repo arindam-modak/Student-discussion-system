@@ -415,6 +415,25 @@ function authStateObserver(user) {
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
+    var currUid=firebase.auth().currentUser.uid;
+    firebase.database().ref('/notifiactions/').orderByChild('uid').equalTo(currUid).once('value',snap=>{
+      if(snap.exists()){
+        
+        snap.forEach(function(childSnapshot){
+            if(childSnapshot.exists()){
+              if(childSnapshot.val().is_seen=="No"){
+                document.getElementById('notification').style.color='red';
+              }
+            }
+
+
+        });
+
+
+      }
+
+
+    });
     //signInMessageElement.removeAttribute('hidden');
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
