@@ -421,6 +421,16 @@ function removeNotification(key,div){
   NotificationElement.removeChild(div);
   firebase.database().ref("/notifiactions/"+key).update({is_seen:"Yes"});
 }
+function openGroupChat(key,groupId){
+  var groupName;
+  firebase.database().ref('/groups/'+groupId).on('value',snap=>
+  {
+    if(snap.exists()){
+      groupName = snap.val().group_name; 
+    }
+    window.location = "http://localhost:5000/showChat.html"+"?groupID="+groupId+"&group_Name="+groupName;
+  });
+}
 // Displays a Message in the UI.
 function displayNotification(key, groupId, admin , date){
   var div = document.getElementById(key);
@@ -433,16 +443,18 @@ function displayNotification(key, groupId, admin , date){
     NotificationElement.appendChild(div);
   }
   var name;
+  var date;
   //console.log("You are invited to the group:"+groupId+"\n "+"Group was created by:"+admin);
   firebase.database().ref('/groups/'+groupId).on('value',snap=>
   {
     if(snap.exists()){
       //console.log(snap.val());
+      date = snap.val().date_form;
       name = snap.val().group_name;
     }
-    div.querySelector('.group-name').innerHTML +="Congratulations!!"+"You are invited to the group: "+name+
-  "\n"+". Group was created by:"+admin;
-  div.querySelector('.close').addEventListener('click', function(){ removeNotification(key,div); }); 
+    div.querySelector('.group-name').innerHTML +=date+"<br />"+"Congratulations!!"+" You are invited to the group:  "+name+"."+"<br />"+" Group was created by:  "+admin+".";
+    div.querySelector('.group-name').addEventListener('click',function(){ openGroupChat(key,groupId); });
+    div.querySelector('.close').addEventListener('click', function(){ removeNotification(key,div); }); 
   });
   //console.log("You are invited to the group:"+groupId+"\n "+"Group was created by:"+admin);
   // Show the card fading-in and scroll to view the new message.

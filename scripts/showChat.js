@@ -110,6 +110,7 @@ function loadGroupMessages(groupId) {
   };
   firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_changed', callback);
+  //firebase.database().ref('/groups/'+groupId+'/messages/').limitToLast(12).on('child_removed', callback);
 }
 
 
@@ -489,8 +490,9 @@ function resetMaterialTextfield(element) {
 // Template for messages.
 var MESSAGE_TEMPLATE =
     '<div class="message-container">' +
-      '<div class="spacing"><div class="pic"></div></div>' +
-      '<div class="message"></div>' +
+      '<div style="display:inline;" class="spacing"><div class="pic"></div></div>' +
+      '<div style="display:inline;" class="message"></div>' +
+      '<div style="display:inline;float: right;" ><button hidden style="background-color:rgb(3,155,229);color:white;border-radius:20%;" class="delmsg">x</button></div>'+
       '<div class="name"></div>' +
     '</div>';
 
@@ -712,7 +714,16 @@ function displayGroupList(groupId,groupName){
   GroupListElement.scrollTop = GroupListElement.scrollHeight;
 
 }
-
+function deleteMessage(div,key){
+  console.log(key);
+  groupMessageListElement.removeChild(div);
+  var url_query = window.location.href;
+  var url = new URL(url_query);
+  var currentGroupId = url.searchParams.get("groupID");
+  var temp=[];
+  firebase.database().ref('/groups/'+currentGroupId+'/messages/'+key).remove();
+      
+}
 
 function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl,uid) {
   var div = document.getElementById(key);
@@ -731,6 +742,8 @@ function displayGroupMessage(key, name, text, picUrl, imageUrl, docUrl,uid) {
       //document.getElementById('group-messages').style.float="right";
       //document.getElementById('group-messages').style.color="red";
       //groupMessageElement.style.float="right";
+      div.querySelector('.delmsg').removeAttribute('hidden');
+      div.querySelector('.delmsg').addEventListener('click',function(){ deleteMessage(div,key);  });
       div.querySelector('.name').textContent = name;
       //div.querySelector('.name').style.right="-100px";
       div.style.backgroundColor="#21f2d9";
@@ -849,12 +862,19 @@ function onGroupDocFileSelected(event) {
 function onGroupMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
-  if (groupMessageInputElement.value && checkSignedInWithMessage()) {
-    groupsaveMessage(groupMessageInputElement.value,activeGrouId).then(function() {
-      // Clear message text field and re-enable the SEND button.
+  if (checkSignedInWithMessage()) {
+    if(!groupMessageInputElement.value.trim().length){
+      window.alert("ERROR: Can't send an empty message!!!");
       resetMaterialTextfield(groupMessageInputElement);
       groupToggleButton();
-    });
+    }
+    else{
+      groupsaveMessage(groupMessageInputElement.value,activeGrouId).then(function() {
+      // Clear message text field and re-enable the SEND button.
+        resetMaterialTextfield(groupMessageInputElement);
+        groupToggleButton();
+      });
+    }
   }
 }
 

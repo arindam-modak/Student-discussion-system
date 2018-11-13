@@ -329,10 +329,12 @@ div.content {
 }
 .mdl-textfield__label:after {
   background-color: #0288D1;
+   margin-top: 0px;
+   color:#0288D1; 
 }
 .mdl-textfield--floating-label.is-focused .mdl-textfield__label {
   color: #0288D1;
-  margin-top: -4px;
+  margin-top: 0px;
 }
 .mdl-button .material-icons {
   top: -1px;

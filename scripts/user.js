@@ -384,6 +384,7 @@ function authStateObserver(user) {
               semElement.setAttribute('value',data.semester);
               departElement.setAttribute('value',data.depart);
               mobileElement.setAttribute('value',data.mobile);
+              bioElement.setAttribute('value',data.bio);
             }
           });
     });
