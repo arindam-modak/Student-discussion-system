@@ -696,7 +696,7 @@ function checkSetup() {
   }
 }
 function sendMe(){
-  window.location = "http://localhost:5000/Dashboard.html";
+  window.location = "http://localhost:5000/user2.html";
 }
 
 

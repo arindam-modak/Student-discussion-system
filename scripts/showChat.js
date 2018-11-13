@@ -413,6 +413,29 @@ var currentGroupId;
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
+    var url_query = window.location.href;
+    var url = new URL(url_query);
+    var currentGroupId = url.searchParams.get("groupID");
+    var members;
+    firebase.database().ref('/groups/'+currentGroupId).on('value',snap=>{
+        if(!snap.exists()){
+          window.location = "http://localhost:5000/group.html";
+        }
+        else{
+          members=snap.val().members;
+          var flag=0;
+          for(var i=0;i<members.length;i++){
+            if(members[i]==firebase.auth().currentUser.uid){
+              flag=1;
+              break;
+            }
+          }
+          if(flag==0){
+            window.location = "http://localhost:5000/group.html";
+          }
+
+        }
+    });
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
     // Set the user's profile pic and name.
@@ -913,7 +936,7 @@ function checkSetup() {
   }
 }
 function sendMe(){
-  window.location = "http://localhost:5000/Dashboard.html";
+  window.location = "http://localhost:5000/user2.html";
 }
 
 
